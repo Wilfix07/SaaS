@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
+import { AuthNav } from '@/components/auth-nav';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -29,9 +30,13 @@ export default function RootLayout({
               <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
                 Home
               </Link>
+              <Link href="/pricing" className="text-sm font-medium hover:text-primary transition-colors">
+                Pricing
+              </Link>
               <Link href="/form" className="text-sm font-medium hover:text-primary transition-colors">
                 Create Project
               </Link>
+              <AuthNav />
             </div>
           </div>
         </nav>

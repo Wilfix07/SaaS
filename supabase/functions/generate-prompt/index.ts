@@ -48,6 +48,9 @@ interface FormData {
     includeDatabase: boolean;
     mobileOptimization: boolean;
   };
+  projectDetails: {
+    additionalDetails?: string;
+  };
   aiProvider: {
     provider: 'none' | 'openai' | 'anthropic' | 'gemini' | 'groq';
     model?: string;
@@ -57,7 +60,7 @@ interface FormData {
 }
 
 function generatePromptFromFormData(formData: FormData): string {
-  const { brandIdentity, colorPalette, images, designStructure, technology } = formData;
+  const { brandIdentity, colorPalette, images, designStructure, technology, projectDetails } = formData;
 
   let prompt = `# Project Specification: ${brandIdentity.projectName}\n\n`;
 
@@ -150,6 +153,14 @@ function generatePromptFromFormData(formData: FormData): string {
     prompt += `- Basic static website functionality\n`;
   }
   prompt += `\n`;
+
+  // Additional Project Details (if provided)
+  if (projectDetails?.additionalDetails && projectDetails.additionalDetails.trim().length > 0) {
+    prompt += `## Additional Project Details & Requirements\n\n`;
+    prompt += `The following additional context and requirements have been provided to ensure the project meets specific needs:\n\n`;
+    prompt += `${projectDetails.additionalDetails.trim()}\n\n`;
+    prompt += `**Important:** Please carefully consider all the above additional requirements when implementing the project specification. These details provide important context that should be integrated throughout the implementation.\n\n`;
+  }
 
   // Implementation Guidelines
   prompt += `## Implementation Guidelines\n\n`;

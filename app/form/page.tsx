@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CompleteFormData, completeFormSchema } from '@/lib/form-schema';
+import { AuthGuard } from '@/components/auth-guard';
 import { BrandIdentitySection } from './components/BrandIdentitySection';
 import { ColorPaletteSection } from './components/ColorPaletteSection';
 import { ImagesSection } from './components/ImagesSection';
 import { DesignStructureSection } from './components/DesignStructureSection';
 import { TechnologySection } from './components/TechnologySection';
+import { ProjectDetailsSection } from './components/ProjectDetailsSection';
 import { AIProviderSection } from './components/AIProviderSection';
 import { FormNavigation } from './components/FormNavigation';
 import { FormPreview } from './components/FormPreview';
@@ -22,7 +24,7 @@ import { Download, Copy, Check, FileDown } from 'lucide-react';
 import { LoadTemplateDialog } from './components/LoadTemplateDialog';
 import { exportToPDF } from '@/lib/export-pdf';
 
-export default function FormPage() {
+function FormPageContent() {
   const [currentStep, setCurrentStep] = useState(0);
   const [generatedPrompt, setGeneratedPrompt] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -72,6 +74,9 @@ export default function FormPage() {
         includeDatabase: false,
         mobileOptimization: true,
       },
+      projectDetails: {
+        additionalDetails: '',
+      },
       aiProvider: {
         provider: 'none',
         model: undefined,
@@ -91,6 +96,7 @@ export default function FormPage() {
       updateFormData('images', value.images);
       updateFormData('designStructure', value.designStructure);
       updateFormData('technology', value.technology);
+      updateFormData('projectDetails', value.projectDetails);
       updateFormData('aiProvider', value.aiProvider);
     });
     return () => subscription.unsubscribe();
@@ -102,6 +108,7 @@ export default function FormPage() {
     { title: 'Images & Placement', component: <ImagesSection form={form} /> },
     { title: 'Design Structure', component: <DesignStructureSection form={form} /> },
     { title: 'Technology', component: <TechnologySection form={form} /> },
+    { title: 'Project Details', component: <ProjectDetailsSection form={form} /> },
     { title: 'AI Provider', component: <AIProviderSection form={form} /> },
   ];
 
@@ -121,11 +128,19 @@ export default function FormPage() {
   const handleSave = async () => {
     try {
       const values = form.getValues();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        alert('Please sign in to save templates');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('project_templates')
         .insert({
           name: values.brandIdentity.projectName || 'Untitled Project',
           form_data: values,
+          user_id: user.id,
         })
         .select()
         .single();
@@ -322,8 +337,8 @@ export default function FormPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Tabs value={currentStep.toString()} className="w-full">
-            <TabsList className="grid grid-cols-6 w-full">
+                            <Tabs value={currentStep.toString()} className="w-full">
+                    <TabsList className="grid grid-cols-7 w-full">
               {steps.map((step, index) => (
                 <TabsTrigger
                   key={index}
@@ -362,6 +377,14 @@ export default function FormPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function FormPage() {
+  return (
+    <AuthGuard>
+      <FormPageContent />
+    </AuthGuard>
   );
 }
 

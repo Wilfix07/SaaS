@@ -3,15 +3,66 @@
 import { CompleteFormData } from '@/lib/form-schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Sparkles, Layout, Palette, Image as ImageIcon } from 'lucide-react';
+import { Eye, EyeOff, Sparkles, Layout, Palette, Image as ImageIcon, Smartphone, Tablet, Monitor, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 
 interface FormPreviewProps {
   formData: Partial<CompleteFormData>;
   isVisible: boolean;
   onToggle: () => void;
 }
+
+type DeviceType = 'iphone' | 'android-phone' | 'ipad' | 'android-tablet' | 'desktop';
+
+interface DeviceConfig {
+  label: string;
+  width: string;
+  height: string;
+  icon: React.ReactNode;
+  className: string;
+}
+
+const deviceConfigs: Record<DeviceType, DeviceConfig> = {
+  'iphone': {
+    label: 'iPhone',
+    width: '375px',
+    height: '667px',
+    icon: <Smartphone className="h-4 w-4" />,
+    className: 'rounded-[2.5rem] border-8 border-gray-900 shadow-2xl',
+  },
+  'android-phone': {
+    label: 'Android Phone',
+    width: '360px',
+    height: '640px',
+    icon: <Smartphone className="h-4 w-4" />,
+    className: 'rounded-[1.5rem] border-4 border-gray-700 shadow-xl',
+  },
+  'ipad': {
+    label: 'iPad',
+    width: '768px',
+    height: '1024px',
+    icon: <Tablet className="h-4 w-4" />,
+    className: 'rounded-[1rem] border-8 border-gray-900 shadow-2xl',
+  },
+  'android-tablet': {
+    label: 'Android Tablet',
+    width: '800px',
+    height: '1280px',
+    icon: <Tablet className="h-4 w-4" />,
+    className: 'rounded-lg border-4 border-gray-700 shadow-xl',
+  },
+  'desktop': {
+    label: 'Desktop/PC',
+    width: '100%',
+    height: 'auto',
+    icon: <Monitor className="h-4 w-4" />,
+    className: 'rounded-lg border-2 border-gray-300 shadow-lg',
+  },
+};
 
 export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps) {
   const colors = formData.colorPalette || {
@@ -35,6 +86,27 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
 
   const [colorKey, setColorKey] = useState(0);
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
+  const [selectedDevice, setSelectedDevice] = useState<DeviceType>('desktop');
+  const [zoomLevel, setZoomLevel] = useState(1.0);
+
+  const deviceConfig = deviceConfigs[selectedDevice];
+
+  // Zoom controls
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => Math.min(prev + 0.1, 2.0)); // Max 200%
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => Math.max(prev - 0.1, 0.5)); // Min 50%
+  };
+
+  const handleZoomReset = () => {
+    setZoomLevel(1.0);
+  };
+
+  const handleZoomChange = (value: number[]) => {
+    setZoomLevel(value[0]);
+  };
 
   // Trigger re-render when colors change for smooth transitions
   useEffect(() => {
@@ -113,6 +185,10 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
 
   const sections = design.sectionsToInclude || [];
 
+  // Determine max height for mobile/tablet devices
+  const isMobileOrTablet = selectedDevice !== 'desktop';
+  const maxHeight = isMobileOrTablet ? deviceConfig.height : 'auto';
+
   return (
     <motion.div
       key="preview-card"
@@ -138,6 +214,91 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
           </Button>
         </CardHeader>
         <CardContent className="p-3 space-y-3">
+          {/* Device Selector */}
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold">Preview Device</Label>
+            <Select value={selectedDevice} onValueChange={(value: DeviceType) => setSelectedDevice(value)}>
+              <SelectTrigger className="h-9 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="iphone">
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="h-3 w-3" />
+                    <span>iPhone</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="android-phone">
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="h-3 w-3" />
+                    <span>Android Phone</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="ipad">
+                  <div className="flex items-center gap-2">
+                    <Tablet className="h-3 w-3" />
+                    <span>iPad</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="android-tablet">
+                  <div className="flex items-center gap-2">
+                    <Tablet className="h-3 w-3" />
+                    <span>Android Tablet</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="desktop">
+                  <div className="flex items-center gap-2">
+                    <Monitor className="h-3 w-3" />
+                    <span>Desktop/PC</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Zoom Controls */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold">Zoom: {Math.round(zoomLevel * 100)}%</Label>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={handleZoomOut}
+                  disabled={zoomLevel <= 0.5}
+                >
+                  <ZoomOut className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={handleZoomReset}
+                >
+                  <RotateCcw className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={handleZoomIn}
+                  disabled={zoomLevel >= 2.0}
+                >
+                  <ZoomIn className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+            <Slider
+              value={[zoomLevel]}
+              onValueChange={handleZoomChange}
+              min={0.5}
+              max={2.0}
+              step={0.1}
+              className="w-full"
+            />
+          </div>
+
           {/* Device Frame Indicator */}
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-2">
             <Layout className="h-3 w-3" />
@@ -145,273 +306,300 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
             <span>•</span>
             <Palette className="h-3 w-3" />
             <span>{design.visualStyle || 'Modern'}</span>
+            <span>•</span>
+            {deviceConfig.icon}
+            <span>{deviceConfig.label}</span>
           </div>
 
-          {/* Mock Page Preview */}
-          <motion.div
-            key={colorKey}
-            initial={{ opacity: 0.8 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className={`border-2 rounded-lg overflow-hidden bg-white ${styleClasses.card}`}
+          {/* Scrollable Device Frame Container */}
+          <div 
+            className="flex justify-center overflow-auto max-h-[600px] border rounded-lg p-2 bg-gray-50 dark:bg-gray-900 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-800"
             style={{
-              fontFamily: getTypography(),
+              scrollbarWidth: 'thin',
             }}
           >
-            {/* Header/Navbar */}
             <motion.div
-              initial={false}
-              animate={{
-                backgroundColor: colors.bannerColor || '#2563eb',
+              key={selectedDevice}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: zoomLevel }}
+              transition={{ duration: 0.3 }}
+              className={`bg-gray-100 dark:bg-gray-800 p-2 ${isMobileOrTablet ? deviceConfig.className : ''}`}
+              style={{
+                width: isMobileOrTablet ? deviceConfig.width : '100%',
+                maxWidth: '100%',
+                transformOrigin: 'top center',
               }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="h-16 flex items-center justify-between px-4 text-white"
-              onMouseEnter={() => setHoveredSection('header')}
-              onMouseLeave={() => setHoveredSection(null)}
             >
-              <div className="flex items-center gap-3">
-                {brand.logo && (
-                  <motion.img
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: 'spring' }}
-                    src={brand.logo}
-                    alt="Logo"
-                    className="h-8 w-8 object-contain"
-                  />
-                )}
-                <motion.span
-                  key={brand.projectName}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="font-bold text-sm"
-                >
-                  {brand.projectName || 'Your Project'}
-                </motion.span>
-              </div>
+              {/* Mock Page Preview */}
               <motion.div
-                animate={{
-                  scale: hoveredSection === 'header' ? 1.05 : 1,
+                key={colorKey}
+                initial={{ opacity: 0.8 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className={`border-2 rounded-lg overflow-hidden bg-white ${styleClasses.card}`}
+                style={{
+                  fontFamily: getTypography(),
+                  width: '100%',
+                  maxHeight: maxHeight,
+                  overflowY: isMobileOrTablet ? 'auto' : 'visible',
                 }}
-                className="flex gap-2"
               >
-                <div className="w-8 h-8 rounded bg-white/20" />
-                <div className="w-8 h-8 rounded bg-white/20" />
-              </motion.div>
-            </motion.div>
-
-            {/* Hero Section */}
-            {sections.includes('Hero') && (
-              <AnimatePresence mode="wait">
+                {/* Header/Navbar */}
                 <motion.div
-                  key="hero"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4 }}
-                  className="relative"
+                  initial={false}
+                  animate={{
+                    backgroundColor: colors.bannerColor || '#2563eb',
+                  }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  className={`${isMobileOrTablet ? 'h-12' : 'h-16'} flex items-center justify-between px-4 text-white`}
+                  onMouseEnter={() => setHoveredSection('header')}
+                  onMouseLeave={() => setHoveredSection(null)}
                 >
-                  {images.heroImage && (
-                    <motion.div
-                      initial={{ scale: 1.1, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5 }}
-                      className={`w-full h-32 overflow-hidden ${styleClasses.image}`}
-                    >
-                      <img
-                        src={images.heroImage}
-                        alt="Hero"
-                        className="w-full h-full object-cover"
+                  <div className="flex items-center gap-3">
+                    {brand.logo && (
+                      <motion.img
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2, type: 'spring' }}
+                        src={brand.logo}
+                        alt="Logo"
+                        className={`${isMobileOrTablet ? 'h-6 w-6' : 'h-8 w-8'} object-contain`}
                       />
-                    </motion.div>
-                  )}
-                  {!images.heroImage && (
-                    <div
-                      className="h-24 flex items-center justify-center"
-                      style={{
-                        backgroundColor: colors.primaryColor + '20',
-                        color: colors.primaryColor,
-                      }}
+                    )}
+                    <motion.span
+                      key={brand.projectName}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className={`font-bold ${isMobileOrTablet ? 'text-xs' : 'text-sm'}`}
                     >
-                      <ImageIcon className="h-6 w-6" />
-                    </div>
-                  )}
-                  {brand.slogan && (
-                    <motion.p
-                      key={brand.slogan}
+                      {brand.projectName || 'Your Project'}
+                    </motion.span>
+                  </div>
+                  <motion.div
+                    animate={{
+                      scale: hoveredSection === 'header' ? 1.05 : 1,
+                    }}
+                    className="flex gap-2"
+                  >
+                    <div className={`${isMobileOrTablet ? 'w-6 h-6' : 'w-8 h-8'} rounded bg-white/20`} />
+                    <div className={`${isMobileOrTablet ? 'w-6 h-6' : 'w-8 h-8'} rounded bg-white/20`} />
+                  </motion.div>
+                </motion.div>
+
+                {/* Hero Section */}
+                {sections.includes('Hero') && (
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key="hero"
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.4 }}
+                      className="relative"
+                    >
+                      {images.heroImage && (
+                        <motion.div
+                          initial={{ scale: 1.1, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.5 }}
+                          className={`w-full ${isMobileOrTablet ? 'h-24' : 'h-32'} overflow-hidden ${styleClasses.image}`}
+                        >
+                          <img
+                            src={images.heroImage}
+                            alt="Hero"
+                            className="w-full h-full object-cover"
+                          />
+                        </motion.div>
+                      )}
+                      {!images.heroImage && (
+                        <div
+                          className={`${isMobileOrTablet ? 'h-20' : 'h-24'} flex items-center justify-center`}
+                          style={{
+                            backgroundColor: colors.primaryColor + '20',
+                            color: colors.primaryColor,
+                          }}
+                        >
+                          <ImageIcon className={`${isMobileOrTablet ? 'h-5 w-5' : 'h-6 w-6'}`} />
+                        </div>
+                      )}
+                      {brand.slogan && (
+                        <motion.p
+                          key={brand.slogan}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className={`${isMobileOrTablet ? 'text-[10px]' : 'text-xs'} italic text-center p-2`}
+                          style={{ color: colors.textColor }}
+                        >
+                          "{brand.slogan}"
+                        </motion.p>
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+                )}
+
+                {/* Content Area */}
+                <motion.div
+                  initial={false}
+                  animate={{
+                    backgroundColor: colors.backgroundColor || '#f8fafc',
+                    color: colors.textColor || '#111827',
+                  }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  className={`${isMobileOrTablet ? 'p-2 space-y-2' : 'p-3 space-y-3'} min-h-[200px]`}
+                >
+                  {/* Features Section */}
+                  {sections.includes('Features') && images.featureImages && images.featureImages.length > 0 && (
+                    <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="text-xs italic text-center p-2"
-                      style={{ color: colors.textColor }}
+                      transition={{ delay: 0.2 }}
+                      className="space-y-2"
                     >
-                      "{brand.slogan}"
-                    </motion.p>
+                      <h3 className={`${isMobileOrTablet ? 'text-[10px]' : 'text-xs'} font-semibold`}>Features</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        {images.featureImages.slice(0, 4).map((img, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.1 * index }}
+                            whileHover={{ scale: 1.05 }}
+                            className={`aspect-square rounded overflow-hidden cursor-pointer ${styleClasses.image}`}
+                          >
+                            <img
+                              src={img}
+                              alt={`Feature ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
                   )}
-                </motion.div>
-              </AnimatePresence>
-            )}
 
-            {/* Content Area */}
-            <motion.div
-              initial={false}
-              animate={{
-                backgroundColor: colors.backgroundColor || '#f8fafc',
-                color: colors.textColor || '#111827',
-              }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="p-3 space-y-3 min-h-[200px]"
-            >
-              {/* Features Section */}
-              {sections.includes('Features') && images.featureImages && images.featureImages.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="space-y-2"
-                >
-                  <h3 className="text-xs font-semibold">Features</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {images.featureImages.slice(0, 4).map((img, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.1 * index }}
-                        whileHover={{ scale: 1.05 }}
-                        className={`aspect-square rounded overflow-hidden cursor-pointer ${styleClasses.image}`}
-                      >
+                  {/* About Section */}
+                  {sections.includes('About') && images.aboutImage && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="space-y-2"
+                    >
+                      <h3 className={`${isMobileOrTablet ? 'text-[10px]' : 'text-xs'} font-semibold`}>About</h3>
+                      <div className={`w-full ${isMobileOrTablet ? 'h-16' : 'h-20'} rounded overflow-hidden ${styleClasses.image}`}>
                         <img
-                          src={img}
-                          alt={`Feature ${index + 1}`}
+                          src={images.aboutImage}
+                          alt="About"
                           className="w-full h-full object-cover"
                         />
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
+                      </div>
+                    </motion.div>
+                  )}
 
-              {/* About Section */}
-              {sections.includes('About') && images.aboutImage && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="space-y-2"
-                >
-                  <h3 className="text-xs font-semibold">About</h3>
-                  <div className={`w-full h-20 rounded overflow-hidden ${styleClasses.image}`}>
-                    <img
-                      src={images.aboutImage}
-                      alt="About"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </motion.div>
-              )}
-
-              {/* CTA Section */}
-              {sections.includes('CTA') && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="space-y-2"
-                >
-                  {images.ctaBackground && (
-                    <div className={`relative w-full h-16 rounded overflow-hidden ${styleClasses.image}`}>
-                      <img
-                        src={images.ctaBackground}
-                        alt="CTA Background"
-                        className="w-full h-full object-cover opacity-50"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
+                  {/* CTA Section */}
+                  {sections.includes('CTA') && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="space-y-2"
+                    >
+                      {images.ctaBackground && (
+                        <div className={`relative w-full ${isMobileOrTablet ? 'h-12' : 'h-16'} rounded overflow-hidden ${styleClasses.image}`}>
+                          <img
+                            src={images.ctaBackground}
+                            alt="CTA Background"
+                            className="w-full h-full object-cover opacity-50"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className={`${isMobileOrTablet ? 'px-2 py-1 text-[10px]' : 'px-4 py-2 text-xs'} text-white font-medium ${styleClasses.button} shadow-lg`}
+                              style={{
+                                backgroundColor: colors.primaryColor || '#2563eb',
+                              }}
+                            >
+                              Call to Action
+                            </motion.button>
+                          </div>
+                        </div>
+                      )}
+                      {!images.ctaBackground && (
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          className={`px-4 py-2 text-white font-medium text-xs ${styleClasses.button} shadow-lg`}
+                          className={`w-full ${isMobileOrTablet ? 'py-1.5 px-2 text-[10px]' : 'py-2 px-3 text-xs'} text-white font-medium ${styleClasses.button}`}
                           style={{
                             backgroundColor: colors.primaryColor || '#2563eb',
                           }}
                         >
                           Call to Action
                         </motion.button>
-                      </div>
-                    </div>
+                      )}
+                    </motion.div>
                   )}
-                  {!images.ctaBackground && (
+
+                  {/* Primary & Secondary Buttons */}
+                  <div className="flex gap-2">
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
+                      whileHover={{ scale: 1.05, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
                       whileTap={{ scale: 0.95 }}
-                      className={`w-full py-2 px-3 text-white font-medium text-xs ${styleClasses.button}`}
+                      className={`flex-1 ${isMobileOrTablet ? 'py-1.5 px-2 text-[10px]' : 'py-2 px-3 text-xs'} text-white font-medium ${styleClasses.button} transition-all`}
                       style={{
                         backgroundColor: colors.primaryColor || '#2563eb',
                       }}
                     >
-                      Call to Action
+                      Primary Action
                     </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`flex-1 ${isMobileOrTablet ? 'py-1.5 px-2 text-[10px]' : 'py-2 px-3 text-xs'} text-white font-medium ${styleClasses.button} transition-all`}
+                      style={{
+                        backgroundColor: colors.secondaryColor || '#38bdf8',
+                      }}
+                    >
+                      Secondary
+                    </motion.button>
+                  </div>
+
+                  {/* Empty State */}
+                  {sections.length === 0 && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className={`flex flex-col items-center justify-center ${isMobileOrTablet ? 'h-24' : 'h-32'} text-muted-foreground`}
+                    >
+                      <Layout className={`${isMobileOrTablet ? 'h-6 w-6' : 'h-8 w-8'} mb-2`} />
+                      <p className={`${isMobileOrTablet ? 'text-[10px]' : 'text-xs'} text-center`}>Add sections to see preview</p>
+                    </motion.div>
                   )}
                 </motion.div>
-              )}
 
-              {/* Primary & Secondary Buttons */}
-              <div className="flex gap-2">
-                <motion.button
-                  whileHover={{ scale: 1.05, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`flex-1 py-2 px-3 text-white font-medium text-xs ${styleClasses.button} transition-all`}
-                  style={{
-                    backgroundColor: colors.primaryColor || '#2563eb',
-                  }}
-                >
-                  Primary Action
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`flex-1 py-2 px-3 text-white font-medium text-xs ${styleClasses.button} transition-all`}
-                  style={{
-                    backgroundColor: colors.secondaryColor || '#38bdf8',
-                  }}
-                >
-                  Secondary
-                </motion.button>
-              </div>
-
-              {/* Empty State */}
-              {sections.length === 0 && (
+                {/* Footer */}
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex flex-col items-center justify-center h-32 text-muted-foreground"
+                  initial={false}
+                  animate={{
+                    backgroundColor: colors.footerColor || '#1e293b',
+                  }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  className={`${isMobileOrTablet ? 'h-10' : 'h-12'} flex items-center justify-center text-white ${isMobileOrTablet ? 'text-[10px]' : 'text-xs'} px-4`}
                 >
-                  <Layout className="h-8 w-8 mb-2" />
-                  <p className="text-xs text-center">Add sections to see preview</p>
+                  {images.footerLogo ? (
+                    <motion.img
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      src={images.footerLogo}
+                      alt="Footer Logo"
+                      className={`${isMobileOrTablet ? 'h-5' : 'h-6'} object-contain`}
+                    />
+                  ) : (
+                    <span>Footer Section</span>
+                  )}
                 </motion.div>
-              )}
+              </motion.div>
             </motion.div>
-
-            {/* Footer */}
-            <motion.div
-              initial={false}
-              animate={{
-                backgroundColor: colors.footerColor || '#1e293b',
-              }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="h-12 flex items-center justify-center text-white text-xs px-4"
-            >
-              {images.footerLogo ? (
-                <motion.img
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  src={images.footerLogo}
-                  alt="Footer Logo"
-                  className="h-6 object-contain"
-                />
-              ) : (
-                <span>Footer Section</span>
-              )}
-            </motion.div>
-          </motion.div>
+          </div>
 
           {/* Color Palette Display */}
           <motion.div

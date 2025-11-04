@@ -48,6 +48,11 @@ export const technologySchema = z.object({
   mobileOptimization: z.boolean().default(true),
 });
 
+// Project Details Schema
+export const projectDetailsSchema = z.object({
+  additionalDetails: z.string().optional(), // Additional context for AI generator
+});
+
 // AI Provider Schema
 export const aiProviderSchema = z.object({
   provider: z.enum(['none', 'openai', 'anthropic', 'gemini', 'groq']).default('none'),
@@ -63,6 +68,7 @@ export const completeFormSchema = z.object({
   images: imagesSchema,
   designStructure: designStructureSchema,
   technology: technologySchema,
+  projectDetails: projectDetailsSchema,
   aiProvider: aiProviderSchema,
 });
 
@@ -71,6 +77,7 @@ export type ColorPaletteData = z.infer<typeof colorPaletteSchema>;
 export type ImagesData = z.infer<typeof imagesSchema>;
 export type DesignStructureData = z.infer<typeof designStructureSchema>;
 export type TechnologyData = z.infer<typeof technologySchema>;
+export type ProjectDetailsData = z.infer<typeof projectDetailsSchema>;
 export type AIProviderData = z.infer<typeof aiProviderSchema>;
 export type CompleteFormData = z.infer<typeof completeFormSchema>;
 
