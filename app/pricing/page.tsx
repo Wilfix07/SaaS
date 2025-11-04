@@ -37,7 +37,7 @@ const plans: PricingPlan[] = [
       'Basic color extraction',
       'Standard preview devices',
     ],
-    cta: 'Start Free Trial',
+    cta: 'Get Started',
     limit: '3 projects',
   },
   {
@@ -58,7 +58,7 @@ const plans: PricingPlan[] = [
       'Priority processing',
     ],
     popular: true,
-    cta: 'Start Free Trial',
+    cta: 'Get Started',
     limit: '20 projects/month',
   },
   {
@@ -80,7 +80,7 @@ const plans: PricingPlan[] = [
       'White-label exports',
       'Advanced analytics',
     ],
-    cta: 'Start Free Trial',
+    cta: 'Get Started',
     limit: 'Unlimited',
   },
   {
@@ -120,10 +120,9 @@ export default function PricingPage() {
     return monthlyTotal - plan.annualPrice;
   };
 
-  const handleStartTrial = (planId: string) => {
+  const handleSelectPlan = (planId: string) => {
     // Save selected plan to localStorage
     localStorage.setItem('selectedPlan', planId);
-    localStorage.setItem('trialStartDate', new Date().toISOString());
     // Redirect to signup page
     window.location.href = '/auth/signup';
   };
@@ -135,13 +134,13 @@ export default function PricingPage() {
         <div className="text-center mb-12 space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
             <Sparkles className="h-4 w-4" />
-            30-Day Free Trial on All Plans
+            Choose Your Plan
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-            Choose Your Plan
+            Pricing Plans
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Start with a 30-day free trial. No credit card required. Cancel anytime.
+            Select the perfect plan for your needs. Cancel anytime.
           </p>
 
           {/* Billing Period Toggle */}
@@ -259,7 +258,7 @@ export default function PricingPage() {
                     <Button
                       className="w-full"
                       variant={plan.popular ? 'default' : 'outline'}
-                      onClick={() => handleStartTrial(plan.id)}
+                      onClick={() => handleSelectPlan(plan.id)}
                       size="lg"
                     >
                       {plan.cta}
@@ -267,14 +266,7 @@ export default function PricingPage() {
                   )}
                 </CardFooter>
 
-                {/* Free Trial Badge */}
-                {!isFree && (
-                  <div className="absolute top-4 right-4">
-                    <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 rounded">
-                      30-Day Free Trial
-                    </span>
-                  </div>
-                )}
+
               </Card>
             );
           })}
@@ -286,33 +278,11 @@ export default function PricingPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">How does the 30-day free trial work?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  All plans include a 30-day free trial. No credit card required to start. You'll have full access to all features of your chosen plan. After 30 days, your subscription will automatically continue unless you cancel.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
                 <CardTitle className="text-lg">Can I change plans later?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
                   Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any charges or credits.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">What happens after the free trial?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  After 30 days, your subscription will automatically continue at the selected plan's price. You can cancel anytime before the trial ends without being charged.
                 </p>
               </CardContent>
             </Card>

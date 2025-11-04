@@ -19,7 +19,7 @@ export default function Home() {
               Build Your Perfect SaaS
               <br />
               <span className="text-primary">In Minutes</span>
-            </h1>
+          </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Transform your ideas into detailed project specifications with our interactive form. Get AI-generated prompts ready for development.
             </p>
@@ -139,8 +139,8 @@ export default function Home() {
                 <h3 className="font-semibold text-lg">Generate & Export</h3>
                 <p className="text-sm text-muted-foreground">
                   Get your AI-generated prompt and export to JSON, PDF, or your favorite IDE
-                </p>
-              </div>
+          </p>
+        </div>
             </div>
             <div className="flex justify-center pt-8">
               <Link href="/auth/signup">

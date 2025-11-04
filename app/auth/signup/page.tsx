@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Sparkles, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { calculateTrialEndDate } from '@/lib/pricing';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -50,26 +49,6 @@ export default function SignupPage() {
       if (authError) throw authError;
 
       if (authData.user) {
-        // Create a free trial subscription
-        const trialEndDate = calculateTrialEndDate();
-        const selectedPlan = localStorage.getItem('selectedPlan') || 'free';
-
-        const { error: subscriptionError } = await supabase
-          .from('subscriptions')
-          .insert({
-            user_id: authData.user.id,
-            plan_id: selectedPlan,
-            status: 'trial',
-            billing_period: 'monthly',
-            trial_start_date: new Date().toISOString(),
-            trial_end_date: trialEndDate.toISOString(),
-          });
-
-        if (subscriptionError) {
-          console.error('Failed to create subscription:', subscriptionError);
-          // Don't block signup if subscription creation fails
-        }
-
         // Clear selected plan from localStorage
         localStorage.removeItem('selectedPlan');
         localStorage.removeItem('trialStartDate');
@@ -123,7 +102,7 @@ export default function SignupPage() {
           </div>
           <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
           <CardDescription>
-            Start your 30-day free trial. No credit card required.
+            Get started with your account today.
           </CardDescription>
         </CardHeader>
         <CardContent>

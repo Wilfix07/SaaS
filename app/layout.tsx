@@ -4,6 +4,8 @@ import './globals.css';
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 import { AuthNav } from '@/components/auth-nav';
+import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,38 +20,49 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-              <Sparkles className="h-6 w-6 text-primary" />
-              <span>SaaS AI Prompt Generator</span>
-            </Link>
-            <div className="flex items-center gap-6">
-              <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
-                Home
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+              <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+                <Sparkles className="h-6 w-6 text-primary" />
+                <span>SaaS AI Prompt Generator</span>
               </Link>
-              <Link href="/pricing" className="text-sm font-medium hover:text-primary transition-colors">
-                Pricing
-              </Link>
-              <Link href="/form" className="text-sm font-medium hover:text-primary transition-colors">
-                Create Project
-              </Link>
-              <AuthNav />
+              <div className="flex items-center gap-6">
+                <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
+                  Home
+                </Link>
+                <Link href="/pricing" className="text-sm font-medium hover:text-primary transition-colors">
+                  Pricing
+                </Link>
+                <Link href="/form" className="text-sm font-medium hover:text-primary transition-colors">
+                  Create Project
+                </Link>
+                <Link href="/frame-lab" className="text-sm font-medium hover:text-primary transition-colors">
+                  Frame Lab
+                </Link>
+                <ThemeToggle />
+                <AuthNav />
+              </div>
             </div>
-          </div>
-        </nav>
-        <main className="min-h-[calc(100vh-4rem)]">
-          {children}
-        </main>
-        <footer className="border-t bg-muted/50">
-          <div className="container mx-auto px-4 py-8">
-            <div className="text-center text-sm text-muted-foreground">
-              <p>&copy; 2025 SaaS AI Prompt Generator. Built with Next.js, Supabase, and AI.</p>
+          </nav>
+          <main className="min-h-[calc(100vh-4rem)]">
+            {children}
+          </main>
+          <footer className="border-t bg-muted/50">
+            <div className="container mx-auto px-4 py-8">
+              <div className="text-center text-sm text-muted-foreground">
+                <p>&copy; 2025 SaaS AI Prompt Generator. Built with Next.js, Supabase, and AI.</p>
+              </div>
             </div>
-          </div>
-        </footer>
+          </footer>
+        </ThemeProvider>
       </body>
     </html>
   );

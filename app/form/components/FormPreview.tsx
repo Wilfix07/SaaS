@@ -3,7 +3,7 @@
 import { CompleteFormData } from '@/lib/form-schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Sparkles, Layout, Palette, Image as ImageIcon, Smartphone, Tablet, Monitor, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { Eye, EyeOff, Sparkles, Layout, Palette, Image as ImageIcon, Smartphone, Tablet, Monitor, Maximize2, Minimize2, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -87,26 +87,63 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
   const [colorKey, setColorKey] = useState(0);
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const [selectedDevice, setSelectedDevice] = useState<DeviceType>('desktop');
-  const [zoomLevel, setZoomLevel] = useState(1.0);
+  const [frameWidth, setFrameWidth] = useState(400); // Default width in pixels
 
   const deviceConfig = deviceConfigs[selectedDevice];
 
-  // Zoom controls
-  const handleZoomIn = () => {
-    setZoomLevel((prev) => Math.min(prev + 0.1, 2.0)); // Max 200%
+  // Frame width controls
+  const handleFrameWidthIncrease = () => {
+    setFrameWidth((prev) => Math.min(prev + 25, 800)); // Max 800px, step of 25px
   };
 
-  const handleZoomOut = () => {
-    setZoomLevel((prev) => Math.max(prev - 0.1, 0.5)); // Min 50%
+  const handleFrameWidthDecrease = () => {
+    setFrameWidth((prev) => Math.max(prev - 25, 300)); // Min 300px, step of 25px
   };
 
-  const handleZoomReset = () => {
-    setZoomLevel(1.0);
+  const handleFrameWidthReset = () => {
+    setFrameWidth(400);
   };
 
-  const handleZoomChange = (value: number[]) => {
-    setZoomLevel(value[0]);
+  const handleFrameWidthChange = (value: number[]) => {
+    setFrameWidth(value[0]);
   };
+
+  // Preset frame widths for quick selection
+  const presetWidths = [
+    { label: 'Small', value: 350, icon: '📱' },
+    { label: 'Medium', value: 400, icon: '💻' },
+    { label: 'Large', value: 500, icon: '🖥️' },
+    { label: 'XL', value: 600, icon: '📺' },
+  ];
+
+  // Keyboard shortcuts for frame width
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if user is not typing in an input field
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      // Alt + Arrow Right to increase frame width
+      if (e.altKey && e.key === 'ArrowRight') {
+        e.preventDefault();
+        setFrameWidth((prev) => Math.min(prev + 25, 800));
+      }
+      // Alt + Arrow Left to decrease frame width
+      if (e.altKey && e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setFrameWidth((prev) => Math.max(prev - 25, 300));
+      }
+      // Alt + R to reset frame width
+      if (e.altKey && e.key === 'r') {
+        e.preventDefault();
+        setFrameWidth(400);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Trigger re-render when colors change for smooth transitions
   useEffect(() => {
@@ -196,9 +233,10 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
       animate={{ opacity: 1, x: 0, scale: 1 }}
       exit={{ opacity: 0, x: 100, scale: 0.9 }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="sticky top-4"
+      className="sticky top-4 transition-all duration-300"
+      style={{ width: `${frameWidth}px`, maxWidth: '100%', minWidth: '300px' }}
     >
-      <Card className={`shadow-xl overflow-hidden ${styleClasses.card}`}>
+      <Card className={`shadow-xl overflow-hidden ${styleClasses.card} w-full`}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary animate-pulse" />
@@ -214,6 +252,74 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
           </Button>
         </CardHeader>
         <CardContent className="p-3 space-y-3">
+          {/* Frame Width Controls */}
+          <div className="space-y-2 p-2 bg-muted/30 rounded-lg border border-dashed">
+            <div className="flex items-center justify-between mb-2">
+              <Label className="text-xs font-semibold">Frame Width: <span className="text-primary font-bold">{frameWidth}px</span></Label>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7 hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={handleFrameWidthDecrease}
+                  disabled={frameWidth <= 300}
+                  title="Decrease Frame Width (-25px) [Alt + ←]"
+                >
+                  <Minimize2 className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7 hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={handleFrameWidthReset}
+                  title="Reset Frame Width (400px) [Alt + R]"
+                >
+                  <Square className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7 hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={handleFrameWidthIncrease}
+                  disabled={frameWidth >= 800}
+                  title="Increase Frame Width (+25px) [Alt + →]"
+                >
+                  <Maximize2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+            <Slider
+              value={[frameWidth]}
+              onValueChange={handleFrameWidthChange}
+              min={300}
+              max={800}
+              step={10}
+              className="w-full"
+            />
+            <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-2">
+              <span>300px</span>
+              <span className="text-xs font-medium">550px</span>
+              <span>800px</span>
+            </div>
+            {/* Preset Width Buttons */}
+            <div className="flex items-center gap-1 flex-wrap">
+              <Label className="text-[10px] text-muted-foreground mr-1">Presets:</Label>
+              {presetWidths.map((preset) => (
+                <Button
+                  key={preset.value}
+                  variant={frameWidth === preset.value ? 'default' : 'outline'}
+                  size="sm"
+                  className="h-6 px-2 text-[10px] flex items-center gap-1"
+                  onClick={() => setFrameWidth(preset.value)}
+                  title={`Set to ${preset.label} (${preset.value}px)`}
+                >
+                  <span>{preset.icon}</span>
+                  <span>{preset.label}</span>
+                </Button>
+              ))}
+            </div>
+          </div>
+
           {/* Device Selector */}
           <div className="space-y-2">
             <Label className="text-xs font-semibold">Preview Device</Label>
@@ -256,49 +362,6 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
             </Select>
           </div>
 
-          {/* Zoom Controls */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold">Zoom: {Math.round(zoomLevel * 100)}%</Label>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={handleZoomOut}
-                  disabled={zoomLevel <= 0.5}
-                >
-                  <ZoomOut className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={handleZoomReset}
-                >
-                  <RotateCcw className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={handleZoomIn}
-                  disabled={zoomLevel >= 2.0}
-                >
-                  <ZoomIn className="h-3 w-3" />
-                </Button>
-              </div>
-            </div>
-            <Slider
-              value={[zoomLevel]}
-              onValueChange={handleZoomChange}
-              min={0.5}
-              max={2.0}
-              step={0.1}
-              className="w-full"
-            />
-          </div>
-
           {/* Device Frame Indicator */}
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-2">
             <Layout className="h-3 w-3" />
@@ -321,8 +384,8 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
             <motion.div
               key={selectedDevice}
               initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: zoomLevel }}
-              transition={{ duration: 0.3 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
               className={`bg-gray-100 dark:bg-gray-800 p-2 ${isMobileOrTablet ? deviceConfig.className : ''}`}
               style={{
                 width: isMobileOrTablet ? deviceConfig.width : '100%',

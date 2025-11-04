@@ -17,10 +17,12 @@ import { FormPreview } from './components/FormPreview';
 import { useFormPreview } from '@/hooks/useFormPreview';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Download, Copy, Check, FileDown } from 'lucide-react';
+import { Download, Copy, Check, FileDown, Maximize2, Minimize2, Square } from 'lucide-react';
 import { LoadTemplateDialog } from './components/LoadTemplateDialog';
 import { exportToPDF } from '@/lib/export-pdf';
 
@@ -30,6 +32,8 @@ function FormPageContent() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [suggestedColors, setSuggestedColors] = useState<string[]>([]);
   const [isCopied, setIsCopied] = useState(false);
+  const [formWidth, setFormWidth] = useState(40); // Default: 40% form, 60% preview (preview is larger)
+  const [cardMaxWidth, setCardMaxWidth] = useState(800); // Default max width for form section cards
   const { formData, updateFormData, isPreviewVisible, togglePreview } = useFormPreview();
   const router = useRouter();
 
@@ -101,6 +105,35 @@ function FormPageContent() {
     });
     return () => subscription.unsubscribe();
   }, [watch, updateFormData]);
+
+  // Keyboard shortcuts for card width adjustment
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if user is not typing in an input field
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      // Ctrl/Cmd + Shift + Arrow Right to increase card width
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'ArrowRight') {
+        e.preventDefault();
+        setCardMaxWidth((prev) => Math.min(prev + 50, 1200));
+      }
+      // Ctrl/Cmd + Shift + Arrow Left to decrease card width
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setCardMaxWidth((prev) => Math.max(prev - 50, 600));
+      }
+      // Ctrl/Cmd + Shift + C to reset card width
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'c') {
+        e.preventDefault();
+        setCardMaxWidth(800);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const steps = [
     { title: 'Brand & Identity', component: <BrandIdentitySection form={form} onColorsExtracted={setSuggestedColors} /> },
@@ -247,6 +280,51 @@ function FormPageContent() {
 
   const progress = ((currentStep + 1) / steps.length) * 100;
 
+  // Form width controls (percentage of available width)
+  const handleFormWidthIncrease = () => {
+    setFormWidth((prev) => Math.min(prev + 5, 85)); // Max 85%
+  };
+
+  const handleFormWidthDecrease = () => {
+    setFormWidth((prev) => Math.max(prev - 5, 40)); // Min 40%
+  };
+
+  const handleFormWidthReset = () => {
+    setFormWidth(40); // Reset to default 40% (60% preview)
+  };
+
+  const handleFormWidthChange = (value: number[]) => {
+    setFormWidth(value[0]);
+  };
+
+  // Calculate preview width based on form width
+  const previewWidth = 100 - formWidth;
+
+  // Card max width controls
+  const handleCardMaxWidthIncrease = () => {
+    setCardMaxWidth((prev) => Math.min(prev + 50, 1200)); // Max 1200px
+  };
+
+  const handleCardMaxWidthDecrease = () => {
+    setCardMaxWidth((prev) => Math.max(prev - 50, 600)); // Min 600px
+  };
+
+  const handleCardMaxWidthReset = () => {
+    setCardMaxWidth(800); // Reset to default
+  };
+
+  const handleCardMaxWidthChange = (value: number[]) => {
+    setCardMaxWidth(value[0]);
+  };
+
+  // Preset card widths
+  const cardWidthPresets = [
+    { label: 'Compact', value: 600 },
+    { label: 'Normal', value: 800 },
+    { label: 'Wide', value: 1000 },
+    { label: 'Full', value: 1200 },
+  ];
+
   if (generatedPrompt) {
     return (
       <div className="container mx-auto py-8 max-w-4xl">
@@ -330,13 +408,124 @@ function FormPageContent() {
 
       <div className="mb-6">
         <Progress value={progress} className="h-2" />
-        <p className="text-sm text-muted-foreground mt-2">
-          Step {currentStep + 1} of {steps.length}: {steps[currentStep].title}
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-2">
+          <p className="text-sm text-muted-foreground">
+            Step {currentStep + 1} of {steps.length}: {steps[currentStep].title}
+          </p>
+          {/* Layout Controls */}
+          <div className="flex flex-col sm:flex-row gap-2 flex-wrap">
+            {/* Form Width Controls */}
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg border border-dashed flex-wrap">
+              <Label className="text-xs font-semibold whitespace-nowrap">Form: {Math.round(formWidth)}%</Label>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={handleFormWidthDecrease}
+                  disabled={formWidth <= 40}
+                  title="Decrease Form Width"
+                >
+                  <Minimize2 className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={handleFormWidthReset}
+                                      title="Reset Form Width (40%)"
+                >
+                  <Square className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={handleFormWidthIncrease}
+                  disabled={formWidth >= 85}
+                  title="Increase Form Width"
+                >
+                  <Maximize2 className="h-3 w-3" />
+                </Button>
+              </div>
+              <div className="w-20 sm:w-24">
+                <Slider
+                  value={[formWidth]}
+                  onValueChange={handleFormWidthChange}
+                  min={40}
+                  max={85}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            {/* Card Max Width Controls */}
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg border border-dashed flex-wrap">
+              <Label className="text-xs font-semibold whitespace-nowrap">Cards: <span className="text-primary font-bold">{cardMaxWidth}px</span></Label>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={handleCardMaxWidthDecrease}
+                  disabled={cardMaxWidth <= 600}
+                  title="Decrease Card Width (-50px) [Ctrl/Cmd + Shift + ←]"
+                >
+                  <Minimize2 className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={handleCardMaxWidthReset}
+                  title="Reset Card Width (800px) [Ctrl/Cmd + Shift + C]"
+                >
+                  <Square className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={handleCardMaxWidthIncrease}
+                  disabled={cardMaxWidth >= 1200}
+                  title="Increase Card Width (+50px) [Ctrl/Cmd + Shift + →]"
+                >
+                  <Maximize2 className="h-3 w-3" />
+                </Button>
+              </div>
+              <div className="w-20 sm:w-24">
+                <Slider
+                  value={[cardMaxWidth]}
+                  onValueChange={handleCardMaxWidthChange}
+                  min={600}
+                  max={1200}
+                  step={25}
+                  className="w-full"
+                />
+              </div>
+              {/* Preset Buttons */}
+              <div className="flex items-center gap-1 flex-wrap">
+                {cardWidthPresets.map((preset) => (
+                  <Button
+                    key={preset.value}
+                    variant={cardMaxWidth === preset.value ? 'default' : 'ghost'}
+                    size="sm"
+                    className="h-5 px-2 text-[10px]"
+                    onClick={() => setCardMaxWidth(preset.value)}
+                    title={`Set to ${preset.label} (${preset.value}px)`}
+                  >
+                    {preset.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="space-y-6 transition-all duration-300" style={{ width: `${formWidth}%`, minWidth: '400px', flexShrink: 0, maxWidth: `${cardMaxWidth}px` }}>
                             <Tabs value={currentStep.toString()} className="w-full">
                     <TabsList className="grid grid-cols-7 w-full">
               {steps.map((step, index) => (
@@ -368,7 +557,7 @@ function FormPageContent() {
           />
         </div>
 
-        <div className="lg:col-span-1">
+        <div className="transition-all duration-300" style={{ width: `${previewWidth}%`, minWidth: '300px', flexShrink: 0 }}>
           <FormPreview
             formData={formData}
             isVisible={isPreviewVisible}
