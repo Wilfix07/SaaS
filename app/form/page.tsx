@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CompleteFormData, completeFormSchema } from '@/lib/form-schema';
@@ -9,6 +9,7 @@ import { ColorPaletteSection } from './components/ColorPaletteSection';
 import { ImagesSection } from './components/ImagesSection';
 import { DesignStructureSection } from './components/DesignStructureSection';
 import { TechnologySection } from './components/TechnologySection';
+import { AIProviderSection } from './components/AIProviderSection';
 import { FormNavigation } from './components/FormNavigation';
 import { FormPreview } from './components/FormPreview';
 import { useFormPreview } from '@/hooks/useFormPreview';
@@ -71,22 +72,29 @@ export default function FormPage() {
         includeDatabase: false,
         mobileOptimization: true,
       },
+      aiProvider: {
+        provider: 'none',
+        model: undefined,
+        temperature: 0.7,
+        enhancePrompt: false,
+      },
     },
   });
 
   const { watch } = form;
 
   // Update preview data when form changes
-  useState(() => {
+  useEffect(() => {
     const subscription = watch((value) => {
       updateFormData('brandIdentity', value.brandIdentity);
       updateFormData('colorPalette', value.colorPalette);
       updateFormData('images', value.images);
       updateFormData('designStructure', value.designStructure);
       updateFormData('technology', value.technology);
+      updateFormData('aiProvider', value.aiProvider);
     });
     return () => subscription.unsubscribe();
-  });
+  }, [watch, updateFormData]);
 
   const steps = [
     { title: 'Brand & Identity', component: <BrandIdentitySection form={form} onColorsExtracted={setSuggestedColors} /> },
@@ -94,6 +102,7 @@ export default function FormPage() {
     { title: 'Images & Placement', component: <ImagesSection form={form} /> },
     { title: 'Design Structure', component: <DesignStructureSection form={form} /> },
     { title: 'Technology', component: <TechnologySection form={form} /> },
+    { title: 'AI Provider', component: <AIProviderSection form={form} /> },
   ];
 
   const handleNext = async () => {
@@ -143,6 +152,11 @@ export default function FormPage() {
       if (error) throw error;
 
       setGeneratedPrompt(data.prompt);
+
+      // Show warning if AI enhancement failed
+      if (data.warning) {
+        console.warn(data.warning);
+      }
 
       // Save submission
       await supabase.from('project_submissions').insert({
@@ -309,7 +323,7 @@ export default function FormPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <Tabs value={currentStep.toString()} className="w-full">
-            <TabsList className="grid grid-cols-5 w-full">
+            <TabsList className="grid grid-cols-6 w-full">
               {steps.map((step, index) => (
                 <TabsTrigger
                   key={index}

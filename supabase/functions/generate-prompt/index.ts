@@ -48,6 +48,12 @@ interface FormData {
     includeDatabase: boolean;
     mobileOptimization: boolean;
   };
+  aiProvider: {
+    provider: 'none' | 'openai' | 'anthropic' | 'gemini' | 'groq';
+    model?: string;
+    temperature?: number;
+    enhancePrompt?: boolean;
+  };
 }
 
 function generatePromptFromFormData(formData: FormData): string {
@@ -187,6 +193,154 @@ function generatePromptFromFormData(formData: FormData): string {
   return prompt;
 }
 
+async function enhancePromptWithAI(
+  prompt: string,
+  provider: string,
+  model?: string,
+  temperature: number = 0.7
+): Promise<string> {
+  const systemPrompt = 'You are a technical specification writer. Enhance and expand the following project specification while maintaining all the provided details and requirements. Add technical insights, best practices, and implementation recommendations.';
+
+  switch (provider) {
+    case 'openai': {
+      const apiKey = Deno.env.get('OPENAI_API_KEY');
+      if (!apiKey) {
+        throw new Error('OpenAI API key not configured');
+      }
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: model || 'gpt-4-turbo-preview',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: prompt }
+          ],
+          temperature,
+          max_tokens: 4000,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`OpenAI API error: ${error.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0].message.content;
+    }
+
+    case 'anthropic': {
+      const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
+      if (!apiKey) {
+        throw new Error('Anthropic API key not configured');
+      }
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: model || 'claude-3-5-sonnet-20241022',
+          max_tokens: 4000,
+          temperature,
+          system: systemPrompt,
+          messages: [
+            { role: 'user', content: prompt }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`Anthropic API error: ${error.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      return data.content[0].text;
+    }
+
+    case 'gemini': {
+      const apiKey = Deno.env.get('GEMINI_API_KEY');
+      if (!apiKey) {
+        throw new Error('Gemini API key not configured');
+      }
+
+      const modelName = model || 'gemini-pro';
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `${systemPrompt}\n\n${prompt}`
+              }]
+            }],
+            generationConfig: {
+              temperature,
+              maxOutputTokens: 4000,
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`Gemini API error: ${error.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    case 'groq': {
+      const apiKey = Deno.env.get('GROQ_API_KEY');
+      if (!apiKey) {
+        throw new Error('Groq API key not configured');
+      }
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: model || 'llama-3.1-70b-versatile',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: prompt }
+          ],
+          temperature,
+          max_tokens: 4000,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`Groq API error: ${error.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0].message.content;
+    }
+
+    default:
+      return prompt;
+  }
+}
+
 Deno.serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -201,45 +355,35 @@ Deno.serve(async (req: Request) => {
     }
 
     // Generate the structured prompt
-    const prompt = generatePromptFromFormData(formData);
+    let prompt = generatePromptFromFormData(formData);
 
-    // Optional: Use OpenAI to enhance the prompt
-    // Uncomment and configure if you want AI enhancement
-    /*
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (openaiApiKey) {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4-turbo-preview',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a technical specification writer. Enhance and expand the following project specification while maintaining all the provided details and requirements.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 2000,
-        }),
-      });
-
-      const data = await response.json();
-      const enhancedPrompt = data.choices[0].message.content;
-      
-      return new Response(
-        JSON.stringify({ prompt: enhancedPrompt }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Enhance prompt with AI if provider is selected and enhancement is enabled
+    const aiProvider = formData.aiProvider || { provider: 'none', enhancePrompt: false };
+    
+    if (
+      aiProvider.provider !== 'none' && 
+      aiProvider.enhancePrompt !== false
+    ) {
+      try {
+        prompt = await enhancePromptWithAI(
+          prompt,
+          aiProvider.provider,
+          aiProvider.model,
+          aiProvider.temperature || 0.7
+        );
+      } catch (error: any) {
+        console.error('AI enhancement error:', error);
+        // Return the basic prompt if AI enhancement fails
+        // Don't fail the entire request, just log the error
+        return new Response(
+          JSON.stringify({ 
+            prompt,
+            warning: `AI enhancement failed: ${error.message}. Returning basic prompt.`
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
-    */
 
     return new Response(
       JSON.stringify({ prompt }),

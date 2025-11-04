@@ -51,7 +51,8 @@ function ImageUploadField({
       }
     } catch (error) {
       console.error('Failed to upload image:', error);
-      alert('Failed to upload image. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload image. Please try again.';
+      alert(errorMessage);
     } finally {
       setIsUploading(false);
     }

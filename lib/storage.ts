@@ -17,6 +17,23 @@ export async function uploadImage(
   bucket: 'project-images' | 'project-logos',
   folder?: string
 ): Promise<ImageUploadResult> {
+  // Validate file type
+  const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+  if (bucket === 'project-logos') {
+    validImageTypes.push('image/svg+xml');
+  }
+  
+  if (!validImageTypes.includes(file.type)) {
+    throw new Error(`Invalid file type: ${file.type}. Allowed types: ${validImageTypes.join(', ')}`);
+  }
+
+  // Validate file size (5MB for logos, 10MB for images)
+  const maxSize = bucket === 'project-logos' ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+  if (file.size > maxSize) {
+    const maxSizeMB = bucket === 'project-logos' ? 5 : 10;
+    throw new Error(`File size exceeds limit. Maximum size: ${maxSizeMB}MB. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+  }
+
   const fileExt = file.name.split('.').pop();
   const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
   const filePath = folder ? `${folder}/${fileName}` : fileName;
@@ -29,7 +46,21 @@ export async function uploadImage(
     });
 
   if (error) {
-    throw new Error(`Failed to upload image: ${error.message}`);
+    console.error('Supabase storage error:', error);
+    // Provide more specific error messages
+    if (error.message?.includes('new row violates row-level security policy')) {
+      throw new Error('Upload failed: Storage permissions not configured. Please contact support.');
+    } else if (error.message?.includes('duplicate')) {
+      throw new Error('A file with this name already exists. Please try again.');
+    } else if (error.message?.includes('size')) {
+      throw new Error('File size is too large. Please use a smaller image.');
+    } else {
+      throw new Error(`Failed to upload image: ${error.message || 'Unknown error'}`);
+    }
+  }
+
+  if (!data) {
+    throw new Error('Upload failed: No data returned from storage.');
   }
 
   const { data: urlData } = supabase.storage

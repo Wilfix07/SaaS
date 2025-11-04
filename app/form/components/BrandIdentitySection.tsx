@@ -50,7 +50,8 @@ export function BrandIdentitySection({ form, onLogoUpload, onColorsExtracted }: 
       }
     } catch (error) {
       console.error('Failed to upload logo:', error);
-      alert('Failed to upload logo. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload logo. Please try again.';
+      alert(errorMessage);
     } finally {
       setIsUploading(false);
     }

@@ -2,9 +2,10 @@
 
 import { CompleteFormData } from '@/lib/form-schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { motion } from 'framer-motion';
-import { Eye, EyeOff } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Eye, EyeOff, Sparkles, Layout, Palette, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
 
 interface FormPreviewProps {
   formData: Partial<CompleteFormData>;
@@ -21,154 +22,452 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
     bannerColor: '#2563eb',
     footerColor: '#1e293b',
   };
-  const brand = formData.brandIdentity || { projectName: '', slogan: '' };
+  const brand = formData.brandIdentity || { projectName: '', slogan: '', logo: '' };
   const images = formData.images || {};
+  const design = formData.designStructure || {
+    projectType: 'Landing Page',
+    sectionsToInclude: ['Hero'],
+    visualStyle: 'Modern',
+    preferredLayout: 'Single Page',
+    fontTypography: 'Inter',
+    includeImageVideo: false,
+  };
+
+  const [colorKey, setColorKey] = useState(0);
+  const [hoveredSection, setHoveredSection] = useState<string | null>(null);
+
+  // Trigger re-render when colors change for smooth transitions
+  useEffect(() => {
+    setColorKey((prev) => prev + 1);
+  }, [colors.primaryColor, colors.secondaryColor, colors.backgroundColor, colors.textColor, colors.bannerColor, colors.footerColor]);
+
+  // Get typography font family
+  const getTypography = () => {
+    if (!design.fontTypography) return 'Inter, sans-serif';
+    const font = design.fontTypography.toLowerCase();
+    if (font.includes('inter')) return 'Inter, sans-serif';
+    if (font.includes('roboto')) return 'Roboto, sans-serif';
+    if (font.includes('poppins')) return 'Poppins, sans-serif';
+    if (font.includes('montserrat')) return 'Montserrat, sans-serif';
+    if (font.includes('open sans')) return 'Open Sans, sans-serif';
+    return `${design.fontTypography}, sans-serif`;
+  };
+
+  // Get visual style classes
+  const getVisualStyleClasses = () => {
+    const style = design.visualStyle?.toLowerCase() || 'modern';
+    switch (style) {
+      case 'minimalist':
+        return {
+          card: 'border-2 border-gray-200 shadow-sm',
+          button: 'rounded-none border',
+          image: 'rounded-none',
+        };
+      case 'corporate':
+        return {
+          card: 'border border-gray-300 shadow-md',
+          button: 'rounded-sm',
+          image: 'rounded-sm',
+        };
+      case 'playful':
+        return {
+          card: 'border-2 border-dashed shadow-lg',
+          button: 'rounded-full',
+          image: 'rounded-full',
+        };
+      case 'luxury':
+        return {
+          card: 'border-2 border-yellow-400 shadow-2xl',
+          button: 'rounded-md',
+          image: 'rounded-lg',
+        };
+      default: // Modern
+        return {
+          card: 'border shadow-lg',
+          button: 'rounded-lg',
+          image: 'rounded-lg',
+        };
+    }
+  };
+
+  const styleClasses = getVisualStyleClasses();
 
   if (!isVisible) {
     return (
-      <div className="fixed top-20 right-4 z-50">
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        className="fixed top-20 right-4 z-50"
+      >
         <Button
           variant="outline"
           size="icon"
           onClick={onToggle}
-          className="rounded-full shadow-lg"
+          className="rounded-full shadow-lg hover:shadow-xl transition-shadow"
         >
           <Eye className="h-4 w-4" />
         </Button>
-      </div>
+      </motion.div>
     );
   }
 
+  const sections = design.sectionsToInclude || [];
+
   return (
     <motion.div
-      initial={{ opacity: 0, x: 100 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 100 }}
+      key="preview-card"
+      initial={{ opacity: 0, x: 100, scale: 0.9 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: 100, scale: 0.9 }}
+      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
       className="sticky top-4"
     >
-      <Card className="shadow-lg">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-lg">Live Preview</CardTitle>
+      <Card className={`shadow-xl overflow-hidden ${styleClasses.card}`}>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+            <CardTitle className="text-lg font-bold">Live Preview</CardTitle>
+          </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={onToggle}
-            className="h-6 w-6"
+            className="h-6 w-6 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             <EyeOff className="h-4 w-4" />
           </Button>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-3 space-y-3">
+          {/* Device Frame Indicator */}
+          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-2">
+            <Layout className="h-3 w-3" />
+            <span>{design.preferredLayout || 'Single Page'}</span>
+            <span>•</span>
+            <Palette className="h-3 w-3" />
+            <span>{design.visualStyle || 'Modern'}</span>
+          </div>
+
           {/* Mock Page Preview */}
-          <div className="border rounded-lg overflow-hidden">
-            {/* Header/Banner */}
-            <div
-              className="h-24 flex items-center justify-center text-white font-bold"
-              style={{
+          <motion.div
+            key={colorKey}
+            initial={{ opacity: 0.8 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className={`border-2 rounded-lg overflow-hidden bg-white ${styleClasses.card}`}
+            style={{
+              fontFamily: getTypography(),
+            }}
+          >
+            {/* Header/Navbar */}
+            <motion.div
+              initial={false}
+              animate={{
                 backgroundColor: colors.bannerColor || '#2563eb',
               }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="h-16 flex items-center justify-between px-4 text-white"
+              onMouseEnter={() => setHoveredSection('header')}
+              onMouseLeave={() => setHoveredSection(null)}
             >
-              {brand.projectName || 'Your Project'}
-            </div>
+              <div className="flex items-center gap-3">
+                {brand.logo && (
+                  <motion.img
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: 'spring' }}
+                    src={brand.logo}
+                    alt="Logo"
+                    className="h-8 w-8 object-contain"
+                  />
+                )}
+                <motion.span
+                  key={brand.projectName}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="font-bold text-sm"
+                >
+                  {brand.projectName || 'Your Project'}
+                </motion.span>
+              </div>
+              <motion.div
+                animate={{
+                  scale: hoveredSection === 'header' ? 1.05 : 1,
+                }}
+                className="flex gap-2"
+              >
+                <div className="w-8 h-8 rounded bg-white/20" />
+                <div className="w-8 h-8 rounded bg-white/20" />
+              </motion.div>
+            </motion.div>
+
+            {/* Hero Section */}
+            {sections.includes('Hero') && (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key="hero"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4 }}
+                  className="relative"
+                >
+                  {images.heroImage && (
+                    <motion.div
+                      initial={{ scale: 1.1, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                      className={`w-full h-32 overflow-hidden ${styleClasses.image}`}
+                    >
+                      <img
+                        src={images.heroImage}
+                        alt="Hero"
+                        className="w-full h-full object-cover"
+                      />
+                    </motion.div>
+                  )}
+                  {!images.heroImage && (
+                    <div
+                      className="h-24 flex items-center justify-center"
+                      style={{
+                        backgroundColor: colors.primaryColor + '20',
+                        color: colors.primaryColor,
+                      }}
+                    >
+                      <ImageIcon className="h-6 w-6" />
+                    </div>
+                  )}
+                  {brand.slogan && (
+                    <motion.p
+                      key={brand.slogan}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-xs italic text-center p-2"
+                      style={{ color: colors.textColor }}
+                    >
+                      "{brand.slogan}"
+                    </motion.p>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            )}
 
             {/* Content Area */}
-            <div
-              className="p-4 space-y-4"
-              style={{
+            <motion.div
+              initial={false}
+              animate={{
                 backgroundColor: colors.backgroundColor || '#f8fafc',
                 color: colors.textColor || '#111827',
               }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="p-3 space-y-3 min-h-[200px]"
             >
-              {/* Hero Image */}
-              {images.heroImage && (
-                <div className="w-full h-32 rounded overflow-hidden">
-                  <img
-                    src={images.heroImage}
-                    alt="Hero"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+              {/* Features Section */}
+              {sections.includes('Features') && images.featureImages && images.featureImages.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="space-y-2"
+                >
+                  <h3 className="text-xs font-semibold">Features</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {images.featureImages.slice(0, 4).map((img, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.1 * index }}
+                        whileHover={{ scale: 1.05 }}
+                        className={`aspect-square rounded overflow-hidden cursor-pointer ${styleClasses.image}`}
+                      >
+                        <img
+                          src={img}
+                          alt={`Feature ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
               )}
 
-              {/* Slogan */}
-              {brand.slogan && (
-                <p className="text-sm italic text-center">{brand.slogan}</p>
+              {/* About Section */}
+              {sections.includes('About') && images.aboutImage && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="space-y-2"
+                >
+                  <h3 className="text-xs font-semibold">About</h3>
+                  <div className={`w-full h-20 rounded overflow-hidden ${styleClasses.image}`}>
+                    <img
+                      src={images.aboutImage}
+                      alt="About"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </motion.div>
               )}
 
-              {/* Primary Button */}
-              <button
-                className="w-full py-2 px-4 rounded text-white font-medium text-sm"
-                style={{
-                  backgroundColor: colors.primaryColor || '#2563eb',
-                }}
-              >
-                Call to Action
-              </button>
-
-              {/* Secondary Button */}
-              <button
-                className="w-full py-2 px-4 rounded text-white font-medium text-sm"
-                style={{
-                  backgroundColor: colors.secondaryColor || '#38bdf8',
-                }}
-              >
-                Learn More
-              </button>
-
-              {/* Feature Images */}
-              {images.featureImages && images.featureImages.length > 0 && (
-                <div className="grid grid-cols-2 gap-2">
-                  {images.featureImages.slice(0, 4).map((img, index) => (
-                    <div
-                      key={index}
-                      className="aspect-square rounded overflow-hidden"
-                    >
+              {/* CTA Section */}
+              {sections.includes('CTA') && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="space-y-2"
+                >
+                  {images.ctaBackground && (
+                    <div className={`relative w-full h-16 rounded overflow-hidden ${styleClasses.image}`}>
                       <img
-                        src={img}
-                        alt={`Feature ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        src={images.ctaBackground}
+                        alt="CTA Background"
+                        className="w-full h-full object-cover opacity-50"
                       />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={`px-4 py-2 text-white font-medium text-xs ${styleClasses.button} shadow-lg`}
+                          style={{
+                            backgroundColor: colors.primaryColor || '#2563eb',
+                          }}
+                        >
+                          Call to Action
+                        </motion.button>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                  )}
+                  {!images.ctaBackground && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`w-full py-2 px-3 text-white font-medium text-xs ${styleClasses.button}`}
+                      style={{
+                        backgroundColor: colors.primaryColor || '#2563eb',
+                      }}
+                    >
+                      Call to Action
+                    </motion.button>
+                  )}
+                </motion.div>
               )}
-            </div>
+
+              {/* Primary & Secondary Buttons */}
+              <div className="flex gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.05, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`flex-1 py-2 px-3 text-white font-medium text-xs ${styleClasses.button} transition-all`}
+                  style={{
+                    backgroundColor: colors.primaryColor || '#2563eb',
+                  }}
+                >
+                  Primary Action
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`flex-1 py-2 px-3 text-white font-medium text-xs ${styleClasses.button} transition-all`}
+                  style={{
+                    backgroundColor: colors.secondaryColor || '#38bdf8',
+                  }}
+                >
+                  Secondary
+                </motion.button>
+              </div>
+
+              {/* Empty State */}
+              {sections.length === 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-col items-center justify-center h-32 text-muted-foreground"
+                >
+                  <Layout className="h-8 w-8 mb-2" />
+                  <p className="text-xs text-center">Add sections to see preview</p>
+                </motion.div>
+              )}
+            </motion.div>
 
             {/* Footer */}
-            <div
-              className="h-16 flex items-center justify-center text-white text-xs"
-              style={{
+            <motion.div
+              initial={false}
+              animate={{
                 backgroundColor: colors.footerColor || '#1e293b',
               }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="h-12 flex items-center justify-center text-white text-xs px-4"
             >
               {images.footerLogo ? (
-                <img
+                <motion.img
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   src={images.footerLogo}
                   alt="Footer Logo"
-                  className="h-8"
+                  className="h-6 object-contain"
                 />
               ) : (
-                'Footer Section'
+                <span>Footer Section</span>
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Color Palette Display */}
-          {Object.keys(colors).length > 0 && (
-            <div>
-              <p className="text-xs font-semibold mb-2">Color Palette</p>
-              <div className="grid grid-cols-3 gap-2">
-                {Object.entries(colors).map(([name, color]) => (
-                  <div key={name} className="space-y-1">
-                    <div
-                      className="w-full h-8 rounded border"
-                      style={{ backgroundColor: color as string }}
-                    />
-                    <p className="text-xs truncate">{name.replace('Color', '')}</p>
-                  </div>
-                ))}
-              </div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="space-y-2"
+          >
+            <div className="flex items-center gap-2">
+              <Palette className="h-3 w-3 text-muted-foreground" />
+              <p className="text-xs font-semibold">Color Palette</p>
             </div>
+            <div className="grid grid-cols-3 gap-1.5">
+              {Object.entries(colors).map(([name, color], index) => (
+                <motion.div
+                  key={name}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.05 * index }}
+                  whileHover={{ scale: 1.1, zIndex: 10 }}
+                  className="space-y-1 cursor-pointer group"
+                >
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      backgroundColor: color as string,
+                    }}
+                    transition={{ duration: 0.4 }}
+                    className={`w-full h-10 rounded border-2 ${styleClasses.image} shadow-sm group-hover:shadow-md transition-shadow`}
+                  />
+                  <p className="text-xs truncate text-muted-foreground group-hover:text-foreground transition-colors">
+                    {name.replace('Color', '').replace(/([A-Z])/g, ' $1').trim()}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Typography Preview */}
+          {design.fontTypography && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="pt-2 border-t space-y-1"
+            >
+              <p className="text-xs font-semibold">Typography</p>
+              <p
+                className="text-xs"
+                style={{
+                  fontFamily: getTypography(),
+                  color: colors.textColor,
+                }}
+              >
+                {design.fontTypography} — The quick brown fox jumps over the lazy dog
+              </p>
+            </motion.div>
           )}
         </CardContent>
       </Card>
