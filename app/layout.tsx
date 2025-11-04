@@ -10,7 +10,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'SaaS AI Prompt Generator',
+  title: 'AI Prompt Generator',
   description: 'Transform your ideas into detailed project specifications with AI',
 };
 
@@ -32,7 +32,7 @@ export default function RootLayout({
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2 font-bold text-xl">
                 <Sparkles className="h-6 w-6 text-primary" />
-                <span>SaaS AI Prompt Generator</span>
+                <span>AI Prompt Generator</span>
               </Link>
               <div className="flex items-center gap-6">
                 <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
@@ -55,7 +55,7 @@ export default function RootLayout({
           <footer className="border-t bg-muted/50">
             <div className="container mx-auto px-4 py-8">
               <div className="text-center text-sm text-muted-foreground">
-                <p>&copy; 2025 SaaS AI Prompt Generator. Built with Next.js, Supabase, and AI.</p>
+                <p>&copy; 2025 AI Prompt Generator. Built with Next.js, Supabase, and AI.</p>
               </div>
             </div>
           </footer>

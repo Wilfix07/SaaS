@@ -1,6 +1,6 @@
 # Vercel Deployment Guide
 
-This guide will walk you through deploying the SaaS AI Prompt Generator to Vercel.
+This guide will walk you through deploying the AI Prompt Generator to Vercel.
 
 ## Prerequisites
 

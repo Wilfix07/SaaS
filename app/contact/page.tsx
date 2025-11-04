@@ -87,8 +87,8 @@ export default function ContactSalesPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <a href="mailto:sales@saas-prompts.com" className="text-primary hover:underline">
-                  sales@saas-prompts.com
+                <a href="mailto:sales@ai-prompts.com" className="text-primary hover:underline">
+                  sales@ai-prompts.com
                 </a>
               </p>
             </CardContent>

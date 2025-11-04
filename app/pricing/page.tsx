@@ -45,8 +45,8 @@ const plans: PricingPlan[] = [
     name: 'Starter',
     description: 'For individual creators and small projects',
     icon: <Zap className="h-6 w-6" />,
-    monthlyPrice: 9,
-    annualPrice: 90,
+    monthlyPrice: 5,
+    annualPrice: 50,
     features: [
       '20 project templates',
       'Enhanced AI prompt generation',
@@ -66,8 +66,8 @@ const plans: PricingPlan[] = [
     name: 'Professional',
     description: 'For growing teams and agencies',
     icon: <Crown className="h-6 w-6" />,
-    monthlyPrice: 29,
-    annualPrice: 290,
+    monthlyPrice: 10,
+    annualPrice: 100,
     features: [
       'Unlimited project templates',
       'Premium AI prompt generation',
@@ -88,8 +88,8 @@ const plans: PricingPlan[] = [
     name: 'Enterprise',
     description: 'For large organizations with custom needs',
     icon: <Rocket className="h-6 w-6" />,
-    monthlyPrice: 99,
-    annualPrice: 990,
+    monthlyPrice: 20,
+    annualPrice: 200,
     features: [
       'Everything in Professional',
       'Dedicated account manager',

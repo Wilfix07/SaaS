@@ -31,7 +31,7 @@ export const imagesSchema = z.object({
 
 // App Design & Structure Schema
 export const designStructureSchema = z.object({
-  projectType: z.enum(['Landing Page', 'Web App', 'SaaS Dashboard', 'Portfolio']),
+  projectType: z.enum(['Landing Page', 'Web App', 'Dashboard', 'Portfolio']),
   sectionsToInclude: z.array(z.string()).min(1, 'Select at least one section'),
   visualStyle: z.enum(['Modern', 'Minimalist', 'Corporate', 'Playful', 'Luxury']),
   preferredLayout: z.enum(['Single Page', 'Multi-section', 'Dashboard']),

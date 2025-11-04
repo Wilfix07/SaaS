@@ -64,7 +64,7 @@ export function DesignStructureSection({ form }: DesignStructureSectionProps) {
             <SelectContent>
               <SelectItem value="Landing Page">Landing Page</SelectItem>
               <SelectItem value="Web App">Web App</SelectItem>
-              <SelectItem value="SaaS Dashboard">SaaS Dashboard</SelectItem>
+              <SelectItem value="Dashboard">Dashboard</SelectItem>
               <SelectItem value="Portfolio">Portfolio</SelectItem>
             </SelectContent>
           </Select>

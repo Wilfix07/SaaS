@@ -16,7 +16,7 @@ export default function Home() {
               AI-Powered Project Generator
             </div>
             <h1 className="text-5xl font-bold tracking-tight">
-              Build Your Perfect SaaS
+              Build Your Perfect Project
               <br />
               <span className="text-primary">In Minutes</span>
           </h1>

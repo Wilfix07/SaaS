@@ -1,4 +1,4 @@
-# SaaS AI Prompt Generator
+# AI Prompt Generator
 
 Transform your ideas into detailed project specifications with our interactive form and AI-powered prompt generation.
 
@@ -75,7 +75,7 @@ Transform your ideas into detailed project specifications with our interactive f
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd saas-ai-prompt-generator
+cd ai-prompt-generator
 ```
 
 2. Install dependencies:

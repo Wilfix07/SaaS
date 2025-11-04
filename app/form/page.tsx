@@ -398,7 +398,7 @@ function FormPageContent() {
     <div className="container mx-auto py-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">SaaS AI Prompt Generator</h1>
+          <h1 className="text-3xl font-bold mb-2">AI Prompt Generator</h1>
           <p className="text-muted-foreground">
             Create a detailed prompt for your next project
           </p>

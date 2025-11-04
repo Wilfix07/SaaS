@@ -41,8 +41,8 @@ export const PRICING_PLANS: Record<PlanId, PricingPlan> = {
     id: 'starter',
     name: 'Starter',
     description: 'For individual creators and small projects',
-    monthlyPrice: 9,
-    annualPrice: 90,
+    monthlyPrice: 5,
+    annualPrice: 50,
     features: [
       '20 project templates',
       'Enhanced AI prompt generation',
@@ -63,8 +63,8 @@ export const PRICING_PLANS: Record<PlanId, PricingPlan> = {
     id: 'professional',
     name: 'Professional',
     description: 'For growing teams and agencies',
-    monthlyPrice: 29,
-    annualPrice: 290,
+    monthlyPrice: 10,
+    annualPrice: 100,
     features: [
       'Unlimited project templates',
       'Premium AI prompt generation',
@@ -87,8 +87,8 @@ export const PRICING_PLANS: Record<PlanId, PricingPlan> = {
     id: 'enterprise',
     name: 'Enterprise',
     description: 'For large organizations with custom needs',
-    monthlyPrice: 99,
-    annualPrice: 990,
+    monthlyPrice: 20,
+    annualPrice: 200,
     features: [
       'Everything in Professional',
       'Dedicated account manager',
