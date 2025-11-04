@@ -233,6 +233,26 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 MIT License - feel free to use this project for your own purposes.
 
+## Deployment
+
+### Deploy to Vercel
+
+This project is optimized for deployment on Vercel. For detailed deployment instructions, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md).
+
+**Quick Deploy:**
+
+1. Push your code to GitHub/GitLab/Bitbucket
+2. Import your repository on [Vercel](https://vercel.com/new)
+3. Set environment variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Deploy!
+
+The project includes:
+- ✅ `vercel.json` configuration file
+- ✅ Optimized `next.config.ts` for Vercel
+- ✅ Environment variable templates (`.env.example`)
+
 ## Support
 
 For issues and questions, please open an issue on GitHub.
