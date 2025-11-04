@@ -44,9 +44,6 @@ export default function RootLayout({
                 <Link href="/form" className="text-sm font-medium hover:text-primary transition-colors">
                   Create Project
                 </Link>
-                <Link href="/frame-lab" className="text-sm font-medium hover:text-primary transition-colors">
-                  Frame Lab
-                </Link>
                 <ThemeToggle />
                 <AuthNav />
               </div>
