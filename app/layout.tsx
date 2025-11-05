@@ -30,18 +30,19 @@ export default function RootLayout({
         >
           <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-                <Sparkles className="h-6 w-6 text-primary" />
-                <span>AI Prompt Generator</span>
+              <Link href="/" className="flex items-center gap-2 font-bold text-base sm:text-lg md:text-xl">
+                <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                <span className="hidden xs:inline">AI Prompt Generator</span>
+                <span className="xs:hidden">AI Prompt</span>
               </Link>
-              <div className="flex items-center gap-6">
-                <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
+              <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
+                <Link href="/" className="text-xs sm:text-sm font-medium hover:text-primary transition-colors hidden sm:inline">
                   Home
                 </Link>
-                <Link href="/pricing" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link href="/pricing" className="text-xs sm:text-sm font-medium hover:text-primary transition-colors">
                   Pricing
                 </Link>
-                <Link href="/form" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link href="/form" className="text-xs sm:text-sm font-medium hover:text-primary transition-colors hidden md:inline">
                   Create Project
                 </Link>
                 <ThemeToggle />

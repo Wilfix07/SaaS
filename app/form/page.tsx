@@ -328,20 +328,20 @@ function FormPageContent() {
 
   if (generatedPrompt) {
     return (
-      <div className="container mx-auto py-8 max-w-4xl">
-        <div className="space-y-6">
+      <div className="container mx-auto py-4 sm:py-8 px-4 max-w-4xl">
+        <div className="space-y-4 sm:space-y-6">
           <div>
-            <h1 className="text-3xl font-bold">Your AI Prompt is Ready!</h1>
-            <p className="text-muted-foreground mt-2">
+            <h1 className="text-2xl sm:text-3xl font-bold">Your AI Prompt is Ready!</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-2">
               Copy this prompt and use it with your favorite AI tool or IDE
             </p>
           </div>
 
-          <div className="bg-muted p-6 rounded-lg relative">
-            <pre className="whitespace-pre-wrap text-sm">{generatedPrompt}</pre>
+          <div className="bg-muted p-4 sm:p-6 rounded-lg relative overflow-x-auto">
+            <pre className="whitespace-pre-wrap text-xs sm:text-sm">{generatedPrompt}</pre>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Button onClick={handleCopyPrompt} className="flex-1">
               {isCopied ? (
                 <>
@@ -366,8 +366,8 @@ function FormPageContent() {
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Open in your favorite IDE:</p>
-            <div className="grid grid-cols-3 gap-3">
+            <p className="text-xs sm:text-sm text-muted-foreground">Open in your favorite IDE:</p>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <Button variant="secondary" onClick={handleOpenInCursor}>
                 Cursor
               </Button>
@@ -396,18 +396,18 @@ function FormPageContent() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="container mx-auto py-4 sm:py-8 px-4">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold mb-2">AI Prompt Generator</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">AI Prompt Generator</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Create a detailed prompt for your next project
           </p>
         </div>
         <LoadTemplateDialog onLoad={handleLoadTemplate} />
       </div>
 
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6">
         <Progress value={progress} className="h-2" />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-2">
           <p className="text-sm text-muted-foreground">
@@ -525,10 +525,10 @@ function FormPageContent() {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="space-y-6 transition-all duration-300" style={{ width: `${formWidth}%`, minWidth: '400px', flexShrink: 0, maxWidth: `${cardMaxWidth}px` }}>
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+        <div className="space-y-4 sm:space-y-6 transition-all duration-300 w-full lg:w-auto" style={{ width: '100%', minWidth: 'auto', flexShrink: 0, maxWidth: '100%' }}>
                             <Tabs value={currentStep.toString()} className="w-full">
-                    <TabsList className="grid grid-cols-7 w-full">
+                    <TabsList className="grid grid-cols-7 w-full text-xs sm:text-sm overflow-x-auto">
               {steps.map((step, index) => (
                 <TabsTrigger
                   key={index}
@@ -558,7 +558,7 @@ function FormPageContent() {
           />
         </div>
 
-        <div className="transition-all duration-300" style={{ width: `${previewWidth}%`, minWidth: '300px', flexShrink: 0 }}>
+        <div className="transition-all duration-300 w-full lg:w-auto hidden lg:block" style={{ width: '100%', minWidth: 'auto', flexShrink: 0 }}>
           <FormPreview
             formData={formData}
             isVisible={isPreviewVisible}
