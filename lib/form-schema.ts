@@ -5,6 +5,7 @@ export const brandIdentitySchema = z.object({
   projectName: z.string().min(1, 'Project name is required'),
   slogan: z.string().optional(),
   logo: z.string().optional(), // URL or path to uploaded logo
+  logoSize: z.number().min(50).max(200).default(100), // Logo size as percentage (50% to 200%)
   mission: z.string().min(10, 'Mission must be at least 10 characters'),
   objectives: z.string().min(10, 'Objectives must be at least 10 characters'),
 });

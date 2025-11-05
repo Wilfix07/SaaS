@@ -44,6 +44,7 @@ function FormPageContent() {
         projectName: '',
         slogan: '',
         logo: '',
+        logoSize: 100,
         mission: '',
         objectives: '',
       },

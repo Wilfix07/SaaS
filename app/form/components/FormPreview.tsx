@@ -3,12 +3,11 @@
 import { CompleteFormData } from '@/lib/form-schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Sparkles, Layout, Palette, Image as ImageIcon, Smartphone, Tablet, Monitor, Maximize2, Minimize2, Square } from 'lucide-react';
+import { Eye, EyeOff, Sparkles, Layout, Palette, Image as ImageIcon, Smartphone, Tablet, Monitor, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
 
 interface FormPreviewProps {
   formData: Partial<CompleteFormData>;
@@ -73,7 +72,7 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
     bannerColor: '#2563eb',
     footerColor: '#1e293b',
   };
-  const brand = formData.brandIdentity || { projectName: '', slogan: '', logo: '' };
+  const brand = formData.brandIdentity || { projectName: '', slogan: '', logo: '', logoSize: 100 };
   const images = formData.images || {};
   const design = formData.designStructure || {
     projectType: 'Landing Page',
@@ -87,63 +86,32 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
   const [colorKey, setColorKey] = useState(0);
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const [selectedDevice, setSelectedDevice] = useState<DeviceType>('desktop');
-  const [frameWidth, setFrameWidth] = useState(400); // Default width in pixels
+  const [currentPage, setCurrentPage] = useState(0);
 
   const deviceConfig = deviceConfigs[selectedDevice];
-
-  // Frame width controls
-  const handleFrameWidthIncrease = () => {
-    setFrameWidth((prev) => Math.min(prev + 25, 800)); // Max 800px, step of 25px
+  const sections = design.sectionsToInclude || [];
+  
+  // Generate pages: 'All' page first, then individual section pages
+  const pages = ['All', ...sections];
+  const totalPages = pages.length;
+  
+  // Get sections to show for current page
+  const getCurrentPageSections = () => {
+    if (currentPage === 0) {
+      // Show all sections on "All" page
+      return sections;
+    }
+    // Show only the selected section
+    const sectionIndex = currentPage - 1;
+    return sections[sectionIndex] ? [sections[sectionIndex]] : [];
   };
 
-  const handleFrameWidthDecrease = () => {
-    setFrameWidth((prev) => Math.max(prev - 25, 300)); // Min 300px, step of 25px
-  };
+  const currentPageSections = getCurrentPageSections();
 
-  const handleFrameWidthReset = () => {
-    setFrameWidth(400);
-  };
-
-  const handleFrameWidthChange = (value: number[]) => {
-    setFrameWidth(value[0]);
-  };
-
-  // Preset frame widths for quick selection
-  const presetWidths = [
-    { label: 'Small', value: 350, icon: '📱' },
-    { label: 'Medium', value: 400, icon: '💻' },
-    { label: 'Large', value: 500, icon: '🖥️' },
-    { label: 'XL', value: 600, icon: '📺' },
-  ];
-
-  // Keyboard shortcuts for frame width
+  // Reset to first page when sections change
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Check if user is not typing in an input field
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return;
-      }
-
-      // Alt + Arrow Right to increase frame width
-      if (e.altKey && e.key === 'ArrowRight') {
-        e.preventDefault();
-        setFrameWidth((prev) => Math.min(prev + 25, 800));
-      }
-      // Alt + Arrow Left to decrease frame width
-      if (e.altKey && e.key === 'ArrowLeft') {
-        e.preventDefault();
-        setFrameWidth((prev) => Math.max(prev - 25, 300));
-      }
-      // Alt + R to reset frame width
-      if (e.altKey && e.key === 'r') {
-        e.preventDefault();
-        setFrameWidth(400);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+    setCurrentPage(0);
+  }, [sections.join(',')]);
 
   // Trigger re-render when colors change for smooth transitions
   useEffect(() => {
@@ -201,6 +169,13 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
 
   const styleClasses = getVisualStyleClasses();
 
+  // Calculate logo size in pixels based on device and size multiplier
+  const getLogoSize = () => {
+    const logoSize = brand.logoSize || 100; // Get logo size from form data, default to 100%
+    const baseSize = isMobileOrTablet ? 24 : 32; // Base size in pixels
+    return (baseSize * logoSize) / 100;
+  };
+
   if (!isVisible) {
     return (
       <motion.div
@@ -220,8 +195,6 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
     );
   }
 
-  const sections = design.sectionsToInclude || [];
-
   // Determine max height for mobile/tablet devices
   const isMobileOrTablet = selectedDevice !== 'desktop';
   const maxHeight = isMobileOrTablet ? deviceConfig.height : 'auto';
@@ -234,133 +207,109 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
       exit={{ opacity: 0, x: 100, scale: 0.9 }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
       className="sticky top-4 transition-all duration-300"
-      style={{ width: `${frameWidth}px`, maxWidth: '100%', minWidth: '300px' }}
     >
       <Card className={`shadow-xl overflow-hidden ${styleClasses.card} w-full`}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-            <CardTitle className="text-lg font-bold">Live Preview</CardTitle>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Sparkles className="h-4 w-4 text-primary animate-pulse flex-shrink-0" />
+            <CardTitle className="text-lg font-bold flex-shrink-0">Live Preview</CardTitle>
+            <div className="flex items-center gap-2 ml-4 flex-1 min-w-0">
+              <Select value={selectedDevice} onValueChange={(value: DeviceType) => setSelectedDevice(value)}>
+                <SelectTrigger className="h-8 text-xs w-full max-w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="iphone">
+                    <div className="flex items-center gap-2">
+                      <Smartphone className="h-3 w-3" />
+                      <span>iPhone</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="android-phone">
+                    <div className="flex items-center gap-2">
+                      <Smartphone className="h-3 w-3" />
+                      <span>Android Phone</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="ipad">
+                    <div className="flex items-center gap-2">
+                      <Tablet className="h-3 w-3" />
+                      <span>iPad</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="android-tablet">
+                    <div className="flex items-center gap-2">
+                      <Tablet className="h-3 w-3" />
+                      <span>Android Tablet</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="desktop">
+                    <div className="flex items-center gap-2">
+                      <Monitor className="h-3 w-3" />
+                      <span>Desktop/PC</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={onToggle}
-            className="h-6 w-6 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="h-6 w-6 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
           >
             <EyeOff className="h-4 w-4" />
           </Button>
         </CardHeader>
         <CardContent className="p-3 space-y-3">
-          {/* Frame Width Controls */}
-          <div className="space-y-2 p-2 bg-muted/30 rounded-lg border border-dashed">
-            <div className="flex items-center justify-between mb-2">
-              <Label className="text-xs font-semibold">Frame Width: <span className="text-primary font-bold">{frameWidth}px</span></Label>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7 hover:bg-primary hover:text-primary-foreground transition-colors"
-                  onClick={handleFrameWidthDecrease}
-                  disabled={frameWidth <= 300}
-                  title="Decrease Frame Width (-25px) [Alt + ←]"
-                >
-                  <Minimize2 className="h-3.5 w-3.5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7 hover:bg-primary hover:text-primary-foreground transition-colors"
-                  onClick={handleFrameWidthReset}
-                  title="Reset Frame Width (400px) [Alt + R]"
-                >
-                  <Square className="h-3.5 w-3.5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7 hover:bg-primary hover:text-primary-foreground transition-colors"
-                  onClick={handleFrameWidthIncrease}
-                  disabled={frameWidth >= 800}
-                  title="Increase Frame Width (+25px) [Alt + →]"
-                >
-                  <Maximize2 className="h-3.5 w-3.5" />
-                </Button>
+          {/* Page Navigation */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between gap-2 pb-2 border-b">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => (prev > 0 ? prev - 1 : totalPages - 1))}
+                disabled={totalPages === 0}
+                className="h-7 px-2 text-xs"
+              >
+                <ChevronLeft className="h-3 w-3 mr-1" />
+                Previous
+              </Button>
+              <div className="flex items-center gap-2 flex-1 justify-center">
+                <span className="text-xs font-medium text-muted-foreground">
+                  Page {currentPage + 1} of {totalPages}
+                </span>
+                <div className="flex items-center gap-1">
+                  {pages.map((page, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentPage(index)}
+                      className={`h-2 w-2 rounded-full transition-all ${
+                        index === currentPage
+                          ? 'bg-primary w-6'
+                          : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                      }`}
+                      title={page}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs text-muted-foreground truncate max-w-[100px]">
+                  {pages[currentPage]}
+                </span>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => (prev < totalPages - 1 ? prev + 1 : 0))}
+                disabled={totalPages === 0}
+                className="h-7 px-2 text-xs"
+              >
+                Next
+                <ChevronRight className="h-3 w-3 ml-1" />
+              </Button>
             </div>
-            <Slider
-              value={[frameWidth]}
-              onValueChange={handleFrameWidthChange}
-              min={300}
-              max={800}
-              step={10}
-              className="w-full"
-            />
-            <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-2">
-              <span>300px</span>
-              <span className="text-xs font-medium">550px</span>
-              <span>800px</span>
-            </div>
-            {/* Preset Width Buttons */}
-            <div className="flex items-center gap-1 flex-wrap">
-              <Label className="text-[10px] text-muted-foreground mr-1">Presets:</Label>
-              {presetWidths.map((preset) => (
-                <Button
-                  key={preset.value}
-                  variant={frameWidth === preset.value ? 'default' : 'outline'}
-                  size="sm"
-                  className="h-6 px-2 text-[10px] flex items-center gap-1"
-                  onClick={() => setFrameWidth(preset.value)}
-                  title={`Set to ${preset.label} (${preset.value}px)`}
-                >
-                  <span>{preset.icon}</span>
-                  <span>{preset.label}</span>
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Device Selector */}
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold">Preview Device</Label>
-            <Select value={selectedDevice} onValueChange={(value: DeviceType) => setSelectedDevice(value)}>
-              <SelectTrigger className="h-9 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="iphone">
-                  <div className="flex items-center gap-2">
-                    <Smartphone className="h-3 w-3" />
-                    <span>iPhone</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="android-phone">
-                  <div className="flex items-center gap-2">
-                    <Smartphone className="h-3 w-3" />
-                    <span>Android Phone</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="ipad">
-                  <div className="flex items-center gap-2">
-                    <Tablet className="h-3 w-3" />
-                    <span>iPad</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="android-tablet">
-                  <div className="flex items-center gap-2">
-                    <Tablet className="h-3 w-3" />
-                    <span>Android Tablet</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="desktop">
-                  <div className="flex items-center gap-2">
-                    <Monitor className="h-3 w-3" />
-                    <span>Desktop/PC</span>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          )}
 
           {/* Device Frame Indicator */}
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-2">
@@ -382,7 +331,7 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
             }}
           >
             <motion.div
-              key={selectedDevice}
+              key={`${selectedDevice}-${currentPage}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
@@ -395,7 +344,7 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
             >
               {/* Mock Page Preview */}
               <motion.div
-                key={colorKey}
+                key={`${colorKey}-${currentPage}`}
                 initial={{ opacity: 0.8 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
@@ -426,7 +375,11 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
                         transition={{ delay: 0.2, type: 'spring' }}
                         src={brand.logo}
                         alt="Logo"
-                        className={`${isMobileOrTablet ? 'h-6 w-6' : 'h-8 w-8'} object-contain`}
+                        className="object-contain"
+                        style={{
+                          width: `${getLogoSize()}px`,
+                          height: `${getLogoSize()}px`,
+                        }}
                       />
                     )}
                     <motion.span
@@ -449,9 +402,10 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
                   </motion.div>
                 </motion.div>
 
-                {/* Hero Section */}
-                {sections.includes('Hero') && (
-                  <AnimatePresence mode="wait">
+                {/* Render sections based on current page */}
+                <AnimatePresence mode="wait">
+                  {/* Hero Section */}
+                  {currentPageSections.includes('Hero') && (
                     <motion.div
                       key="hero"
                       initial={{ opacity: 0, y: -20 }}
@@ -495,12 +449,11 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
                         >
                           "{brand.slogan}"
                         </motion.p>
-                      )}
+                                            )}
                     </motion.div>
-                  </AnimatePresence>
-                )}
+                  )}
 
-                {/* Content Area */}
+                  {/* Content Area */}
                 <motion.div
                   initial={false}
                   animate={{
@@ -511,7 +464,7 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
                   className={`${isMobileOrTablet ? 'p-2 space-y-2' : 'p-3 space-y-3'} min-h-[200px]`}
                 >
                   {/* Features Section */}
-                  {sections.includes('Features') && images.featureImages && images.featureImages.length > 0 && (
+                  {currentPageSections.includes('Features') && images.featureImages && images.featureImages.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -540,8 +493,8 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
                     </motion.div>
                   )}
 
-                  {/* About Section */}
-                  {sections.includes('About') && images.aboutImage && (
+                                     {/* About Section */}
+                   {currentPageSections.includes('About') && images.aboutImage && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -559,7 +512,7 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
                   )}
 
                   {/* CTA Section */}
-                  {sections.includes('CTA') && (
+                  {currentPageSections.includes('CTA') && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -627,19 +580,21 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
                   </div>
 
                   {/* Empty State */}
-                  {sections.length === 0 && (
+                  {currentPageSections.length === 0 && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className={`flex flex-col items-center justify-center ${isMobileOrTablet ? 'h-24' : 'h-32'} text-muted-foreground`}
                     >
                       <Layout className={`${isMobileOrTablet ? 'h-6 w-6' : 'h-8 w-8'} mb-2`} />
-                      <p className={`${isMobileOrTablet ? 'text-[10px]' : 'text-xs'} text-center`}>Add sections to see preview</p>
+                      <p className={`${isMobileOrTablet ? 'text-[10px]' : 'text-xs'} text-center`}>No sections to display</p>
                     </motion.div>
                   )}
                 </motion.div>
+                </AnimatePresence>
 
-                {/* Footer */}
+                {/* Footer - only show on "All" page or last section */}
+                {(currentPage === 0 || currentPage === totalPages - 1) && (
                 <motion.div
                   initial={false}
                   animate={{
@@ -656,11 +611,12 @@ export function FormPreview({ formData, isVisible, onToggle }: FormPreviewProps)
                       alt="Footer Logo"
                       className={`${isMobileOrTablet ? 'h-5' : 'h-6'} object-contain`}
                     />
-                  ) : (
-                    <span>Footer Section</span>
-                  )}
+                                      ) : (
+                      <span>Footer Section</span>
+                    )}
+                  </motion.div>
+                )}
                 </motion.div>
-              </motion.div>
             </motion.div>
           </div>
 

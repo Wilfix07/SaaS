@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 import { Upload } from 'lucide-react';
 import { useState } from 'react';
 import { uploadImage } from '@/lib/storage';
@@ -122,6 +123,42 @@ export function BrandIdentitySection({ form, onLogoUpload, onColorsExtracted }: 
             Upload your logo to automatically extract color palette suggestions
           </p>
         </div>
+
+        {/* Logo Size Control - only show when logo is uploaded */}
+        {form.watch('brandIdentity.logo') && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="logoSize">
+                Logo Size: <span className="text-primary font-bold">{form.watch('brandIdentity.logoSize') || 100}%</span>
+              </Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => form.setValue('brandIdentity.logoSize', 100)}
+                className="h-7 px-2 text-xs"
+              >
+                Reset
+              </Button>
+            </div>
+            <Slider
+              value={[form.watch('brandIdentity.logoSize') || 100]}
+              onValueChange={(value) => form.setValue('brandIdentity.logoSize', value[0])}
+              min={50}
+              max={200}
+              step={5}
+              className="w-full"
+            />
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>50%</span>
+              <span className="font-medium">100%</span>
+              <span>200%</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Adjust the size of your logo in the preview (50% to 200% of default size)
+            </p>
+          </div>
+        )}
 
         <div className="space-y-2">
           <Label htmlFor="mission">Mission *</Label>
