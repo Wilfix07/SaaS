@@ -14,7 +14,7 @@ export function useFrameLayout(layoutName: string = 'default') {
   const [layouts, setLayouts] = useState<FrameLayout>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Load layout from backend
   useEffect(() => {
