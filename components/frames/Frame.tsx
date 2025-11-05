@@ -55,7 +55,7 @@ export function Frame({
   const [isDragging, setIsDragging] = useState(false);
   const [announcement, setAnnouncement] = useState<string>('');
   const frameRef = useRef<HTMLDivElement>(null);
-  const resizeTimeoutRef = useRef<NodeJS.Timeout>();
+  const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Snap value to grid
   const snap = useCallback(
