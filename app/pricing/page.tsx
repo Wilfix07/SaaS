@@ -128,29 +128,30 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted py-16">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted py-8 sm:py-12 md:py-16 page-transition">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-12 space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-            <Sparkles className="h-4 w-4" />
+        <div className="text-center mb-8 sm:mb-12 space-y-3 sm:space-y-4 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium">
+            <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
             Choose Your Plan
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight px-4 sm:px-0">
             Pricing Plans
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4 sm:px-0">
             Select the perfect plan for your needs. Cancel anytime.
           </p>
 
           {/* Billing Period Toggle */}
-          <div className="flex items-center justify-center gap-4 mt-8">
-            <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-foreground' : 'text-muted-foreground'}`}>
+          <div className="flex items-center justify-center gap-3 sm:gap-4 mt-6 sm:mt-8">
+            <span className={`text-xs sm:text-sm font-medium ${billingPeriod === 'monthly' ? 'text-foreground' : 'text-muted-foreground'}`}>
               Monthly
             </span>
             <button
               onClick={() => setBillingPeriod(billingPeriod === 'monthly' ? 'annual' : 'monthly')}
-              className="relative inline-flex h-6 w-11 items-center rounded-full bg-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              className="relative inline-flex h-6 w-11 items-center rounded-full bg-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95"
+              aria-label="Toggle billing period"
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -158,11 +159,11 @@ export default function PricingPage() {
                 }`}
               />
             </button>
-            <span className={`text-sm font-medium ${billingPeriod === 'annual' ? 'text-foreground' : 'text-muted-foreground'}`}>
+            <span className={`text-xs sm:text-sm font-medium ${billingPeriod === 'annual' ? 'text-foreground' : 'text-muted-foreground'}`}>
               Annual
             </span>
             {billingPeriod === 'annual' && (
-              <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 rounded">
+              <span className="px-2 py-1 text-[10px] sm:text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 rounded">
                 Save up to 17%
               </span>
             )}
@@ -170,7 +171,7 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
           {plans.map((plan) => {
             const price = getPrice(plan);
             const savings = getAnnualSavings(plan);
@@ -179,11 +180,11 @@ export default function PricingPage() {
             return (
               <Card
                 key={plan.id}
-                className={`relative transition-all duration-300 ${
+                className={`relative transition-all duration-300 animate-scale-in ${
                   plan.popular
-                    ? 'border-primary shadow-lg scale-105 md:scale-110 lg:scale-105'
-                    : 'hover:shadow-lg hover:scale-105'
-                } ${hoveredPlan === plan.id ? 'shadow-xl' : ''}`}
+                    ? 'border-primary shadow-lg md:scale-105 lg:scale-105'
+                    : 'hover:shadow-lg'
+                } ${hoveredPlan === plan.id ? 'shadow-xl scale-105' : ''}`}
                 onMouseEnter={() => setHoveredPlan(plan.id)}
                 onMouseLeave={() => setHoveredPlan(null)}
               >
@@ -195,59 +196,59 @@ export default function PricingPage() {
                   </div>
                 )}
 
-                <CardHeader>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <CardHeader className="p-4 sm:p-6">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                    <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 text-primary">
                       {plan.icon}
                     </div>
                     <div>
-                      <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                      <CardTitle className="text-xl sm:text-2xl">{plan.name}</CardTitle>
                       {plan.limit && (
-                        <p className="text-xs text-muted-foreground mt-1">{plan.limit}</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">{plan.limit}</p>
                       )}
                     </div>
                   </div>
-                  <CardDescription>{plan.description}</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">{plan.description}</CardDescription>
                 </CardHeader>
 
-                <CardContent>
-                  <div className="mb-6">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="mb-4 sm:mb-6">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-4xl font-bold">
+                      <span className="text-3xl sm:text-4xl font-bold">
                         ${price}
                       </span>
                       {!isFree && (
-                        <span className="text-muted-foreground">
+                        <span className="text-sm sm:text-base text-muted-foreground">
                           /{billingPeriod === 'monthly' ? 'mo' : 'yr'}
                         </span>
                       )}
                     </div>
                     {billingPeriod === 'annual' && savings > 0 && (
-                      <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                      <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mt-1">
                         Save ${savings}/year
                       </p>
                     )}
                     {!isFree && (
-                      <p className="text-xs text-muted-foreground mt-2">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-2">
                         Billed {billingPeriod === 'annual' ? 'annually' : 'monthly'}
                       </p>
                     )}
                   </div>
 
-                  <ul className="space-y-3">
+                  <ul className="space-y-2 sm:space-y-3">
                     {plan.features.map((feature, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">{feature}</span>
+                        <Check className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-xs sm:text-sm">{feature}</span>
                       </li>
                     ))}
                   </ul>
                 </CardContent>
 
-                <CardFooter>
+                <CardFooter className="p-4 sm:p-6 pt-0">
                   {plan.cta === 'Contact Sales' ? (
                     <Button
-                      className="w-full bg-black text-white hover:bg-black/90"
+                      className="w-full bg-black text-white hover:bg-black/90 active:scale-95"
                       variant={plan.popular ? 'default' : 'outline'}
                       size="lg"
                       asChild
@@ -256,7 +257,7 @@ export default function PricingPage() {
                     </Button>
                   ) : (
                     <Button
-                      className="w-full"
+                      className="w-full active:scale-95"
                       variant={plan.popular ? 'default' : 'outline'}
                       onClick={() => handleSelectPlan(plan.id)}
                       size="lg"
@@ -273,9 +274,9 @@ export default function PricingPage() {
         </div>
 
         {/* FAQ Section */}
-        <div className="max-w-3xl mx-auto mt-16">
-          <h2 className="text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
-          <div className="space-y-6">
+        <div className="max-w-3xl mx-auto mt-8 sm:mt-12 md:mt-16 px-4 sm:px-0">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Frequently Asked Questions</h2>
+          <div className="space-y-4 sm:space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Can I change plans later?</CardTitle>
@@ -301,11 +302,11 @@ export default function PricingPage() {
         </div>
 
         {/* CTA Section */}
-        <div className="text-center mt-16">
-          <p className="text-muted-foreground mb-4">
+        <div className="text-center mt-8 sm:mt-12 md:mt-16 px-4 sm:px-0">
+          <p className="text-sm sm:text-base text-muted-foreground mb-4">
             Need help choosing a plan? Contact our sales team.
           </p>
-          <Button variant="outline" size="lg" className="bg-black text-white hover:bg-black/90 border-black" asChild>
+          <Button variant="outline" size="lg" className="bg-black text-white hover:bg-black/90 border-black active:scale-95 w-full sm:w-auto" asChild>
             <Link href="/contact">Contact Sales</Link>
           </Button>
         </div>

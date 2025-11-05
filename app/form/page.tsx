@@ -328,21 +328,21 @@ function FormPageContent() {
 
   if (generatedPrompt) {
     return (
-      <div className="container mx-auto py-8 max-w-4xl">
-        <div className="space-y-6">
+      <div className="container mx-auto py-6 sm:py-8 max-w-4xl px-4 sm:px-6 page-transition">
+        <div className="space-y-4 sm:space-y-6 animate-fade-in">
           <div>
-            <h1 className="text-3xl font-bold">Your AI Prompt is Ready!</h1>
-            <p className="text-muted-foreground mt-2">
+            <h1 className="text-2xl sm:text-3xl font-bold">Your AI Prompt is Ready!</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-2">
               Copy this prompt and use it with your favorite AI tool or IDE
             </p>
           </div>
 
-          <div className="bg-muted p-6 rounded-lg relative">
-            <pre className="whitespace-pre-wrap text-sm">{generatedPrompt}</pre>
+          <div className="bg-muted p-4 sm:p-6 rounded-lg relative">
+            <pre className="whitespace-pre-wrap text-xs sm:text-sm overflow-x-auto">{generatedPrompt}</pre>
           </div>
 
-          <div className="flex gap-4">
-            <Button onClick={handleCopyPrompt} className="flex-1">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <Button onClick={handleCopyPrompt} className="flex-1 active:scale-95">
               {isCopied ? (
                 <>
                   <Check className="mr-2 h-4 w-4" />
@@ -355,26 +355,26 @@ function FormPageContent() {
                 </>
               )}
             </Button>
-            <Button variant="outline" onClick={handleExportJSON}>
+            <Button variant="outline" onClick={handleExportJSON} className="active:scale-95">
               <Download className="mr-2 h-4 w-4" />
               JSON
             </Button>
-            <Button variant="outline" onClick={handleExportPDF}>
+            <Button variant="outline" onClick={handleExportPDF} className="active:scale-95">
               <FileDown className="mr-2 h-4 w-4" />
               PDF
             </Button>
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Open in your favorite IDE:</p>
-            <div className="grid grid-cols-3 gap-3">
-              <Button variant="secondary" onClick={handleOpenInCursor}>
+            <p className="text-xs sm:text-sm text-muted-foreground">Open in your favorite IDE:</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Button variant="secondary" onClick={handleOpenInCursor} className="active:scale-95">
                 Cursor
               </Button>
-              <Button variant="secondary" onClick={handleOpenInReplit}>
+              <Button variant="secondary" onClick={handleOpenInReplit} className="active:scale-95">
                 Replit
               </Button>
-              <Button variant="secondary" onClick={handleOpenInVSCode}>
+              <Button variant="secondary" onClick={handleOpenInVSCode} className="active:scale-95">
                 VS Code
               </Button>
             </div>
@@ -386,7 +386,7 @@ function FormPageContent() {
               setGeneratedPrompt(null);
               setCurrentStep(0);
             }}
-            className="w-full"
+            className="w-full active:scale-95"
           >
             Create Another Project
           </Button>
@@ -396,21 +396,21 @@ function FormPageContent() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="container mx-auto py-4 sm:py-6 md:py-8 px-4 sm:px-6 page-transition">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold mb-2">AI Prompt Generator</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">AI Prompt Generator</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Create a detailed prompt for your next project
           </p>
         </div>
         <LoadTemplateDialog onLoad={handleLoadTemplate} />
       </div>
 
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6">
         <Progress value={progress} className="h-2" />
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-2">
-          <p className="text-sm text-muted-foreground">
+        <div className="flex flex-col gap-3 sm:gap-2 mt-2">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Step {currentStep + 1} of {steps.length}: {steps[currentStep].title}
           </p>
           {/* Layout Controls */}
@@ -525,10 +525,10 @@ function FormPageContent() {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="space-y-6 transition-all duration-300" style={{ width: `${formWidth}%`, minWidth: '400px', flexShrink: 0, maxWidth: `${cardMaxWidth}px` }}>
+      <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
+        <div className="space-y-4 sm:space-y-6 transition-all duration-300 w-full lg:flex-shrink-0" style={{ width: '100%', maxWidth: '100%' }}>
                             <Tabs value={currentStep.toString()} className="w-full">
-                    <TabsList className="grid grid-cols-7 w-full">
+                    <TabsList className="grid grid-cols-7 w-full overflow-x-auto">
               {steps.map((step, index) => (
                 <TabsTrigger
                   key={index}
@@ -558,7 +558,7 @@ function FormPageContent() {
           />
         </div>
 
-        <div className="transition-all duration-300" style={{ width: `${previewWidth}%`, minWidth: '300px', flexShrink: 0 }}>
+        <div className="transition-all duration-300 w-full lg:w-auto lg:flex-1">
           <FormPreview
             formData={formData}
             isVisible={isPreviewVisible}
