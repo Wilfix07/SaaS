@@ -15,44 +15,26 @@ export default function Home() {
               <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
               AI-Powered Project Generator
             </div>
-<<<<<<< HEAD
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight px-4 sm:px-0">
-=======
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
               Build Your Perfect Project
               <br />
               <span className="text-primary">In Minutes</span>
           </h1>
-<<<<<<< HEAD
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4 sm:px-0">
-=======
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
               Transform your ideas into detailed project specifications with our interactive form. Get AI-generated prompts ready for development.
             </p>
           </div>
 
           {/* CTA */}
-<<<<<<< HEAD
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 px-4 sm:px-0 animate-slide-up">
             <Link href="/auth/signup" className="w-full sm:w-auto">
               <Button size="lg" className="gap-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-black text-white hover:bg-black/90 w-full sm:min-w-[160px] active:scale-95">
-=======
-          <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
-            <Link href="/auth/signup" className="w-full sm:w-auto">
-              <Button size="lg" className="gap-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-black text-white hover:bg-black/90 min-w-[160px] w-full sm:w-auto">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
                 Start Creating
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/pricing" className="w-full sm:w-auto">
-<<<<<<< HEAD
               <Button size="lg" variant="outline" className="gap-2 border-2 border-black shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 bg-black text-white hover:bg-black/90 w-full sm:min-w-[160px] active:scale-95">
-=======
-              <Button size="lg" variant="outline" className="gap-2 border-2 border-black shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 bg-black text-white hover:bg-black/90 min-w-[160px] w-full sm:w-auto">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
                 View Pricing
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -60,13 +42,8 @@ export default function Home() {
           </div>
 
           {/* Features Grid */}
-<<<<<<< HEAD
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-12 md:mt-16 px-4 sm:px-0">
             <div className="p-4 sm:p-6 rounded-lg border bg-card/95 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300 space-y-3 group hover:border-primary/50 animate-scale-in">
-=======
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-12 sm:mt-16">
-            <div className="p-4 sm:p-6 rounded-lg border bg-card/95 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300 space-y-3 group hover:border-primary/50">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                 <Palette className="h-6 w-6 text-primary" />
               </div>
@@ -132,17 +109,10 @@ export default function Home() {
           </div>
 
           {/* How It Works */}
-<<<<<<< HEAD
           <div className="mt-12 sm:mt-16 md:mt-20 space-y-6 sm:space-y-8 px-4 sm:px-0">
             <h2 className="text-2xl sm:text-3xl font-bold">How It Works</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
               <div className="space-y-3 p-4 sm:p-6 rounded-lg bg-card/50 backdrop-blur-sm border hover:shadow-md transition-all animate-fade-in">
-=======
-          <div className="mt-12 sm:mt-20 space-y-6 sm:space-y-8">
-            <h2 className="text-2xl sm:text-3xl font-bold">How It Works</h2>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-              <div className="space-y-3 p-4 sm:p-6 rounded-lg bg-card/50 backdrop-blur-sm border hover:shadow-md transition-all">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
                 <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto font-bold text-xl shadow-lg">
                   1
                 </div>
@@ -172,15 +142,9 @@ export default function Home() {
           </p>
         </div>
             </div>
-<<<<<<< HEAD
             <div className="flex justify-center pt-6 sm:pt-8 px-4 sm:px-0">
               <Link href="/auth/signup" className="w-full sm:w-auto">
                 <Button size="lg" className="gap-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-black text-white hover:bg-black/90 w-full sm:min-w-[200px] active:scale-95">
-=======
-            <div className="flex justify-center pt-8">
-              <Link href="/auth/signup" className="w-full sm:w-auto">
-                <Button size="lg" className="gap-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-black text-white hover:bg-black/90 min-w-[200px] w-full sm:w-auto">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
                   Start Your Project Now
                   <ArrowRight className="h-4 w-4" />
                 </Button>

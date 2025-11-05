@@ -128,32 +128,18 @@ export default function PricingPage() {
   };
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen bg-gradient-to-b from-background to-muted py-8 sm:py-12 md:py-16 page-transition">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 space-y-3 sm:space-y-4 animate-fade-in">
-=======
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted py-8 sm:py-12 md:py-16">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8 sm:mb-12 space-y-4">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium">
             <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
             Choose Your Plan
           </div>
-<<<<<<< HEAD
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight px-4 sm:px-0">
             Pricing Plans
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4 sm:px-0">
-=======
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
-            Pricing Plans
-          </h1>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
             Select the perfect plan for your needs. Cancel anytime.
           </p>
 
@@ -185,11 +171,7 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Cards */}
-<<<<<<< HEAD
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
-=======
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
           {plans.map((plan) => {
             const price = getPrice(plan);
             const savings = getAnnualSavings(plan);
@@ -292,15 +274,9 @@ export default function PricingPage() {
         </div>
 
         {/* FAQ Section */}
-<<<<<<< HEAD
         <div className="max-w-3xl mx-auto mt-8 sm:mt-12 md:mt-16 px-4 sm:px-0">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Frequently Asked Questions</h2>
           <div className="space-y-4 sm:space-y-6">
-=======
-        <div className="max-w-3xl mx-auto mt-12 sm:mt-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Frequently Asked Questions</h2>
-          <div className="space-y-6">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Can I change plans later?</CardTitle>
@@ -326,19 +302,11 @@ export default function PricingPage() {
         </div>
 
         {/* CTA Section */}
-<<<<<<< HEAD
         <div className="text-center mt-8 sm:mt-12 md:mt-16 px-4 sm:px-0">
           <p className="text-sm sm:text-base text-muted-foreground mb-4">
             Need help choosing a plan? Contact our sales team.
           </p>
           <Button variant="outline" size="lg" className="bg-black text-white hover:bg-black/90 border-black active:scale-95 w-full sm:w-auto" asChild>
-=======
-        <div className="text-center mt-12 sm:mt-16">
-          <p className="text-sm sm:text-base text-muted-foreground mb-4">
-            Need help choosing a plan? Contact our sales team.
-          </p>
-          <Button variant="outline" size="lg" className="bg-black text-white hover:bg-black/90 border-black w-full sm:w-auto" asChild>
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
             <Link href="/contact">Contact Sales</Link>
           </Button>
         </div>

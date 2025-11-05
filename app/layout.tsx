@@ -57,34 +57,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-<<<<<<< HEAD
           <ResponsiveNav />
           <main className="min-h-[calc(100vh-4rem)] pb-16 md:pb-0 pt-14 md:pt-0">
-=======
-          <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-2 font-bold text-base sm:text-lg md:text-xl">
-                <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                <span className="hidden xs:inline">AI Prompt Generator</span>
-                <span className="xs:hidden">AI Prompt</span>
-              </Link>
-              <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
-                <Link href="/" className="text-xs sm:text-sm font-medium hover:text-primary transition-colors hidden sm:inline">
-                  Home
-                </Link>
-                <Link href="/pricing" className="text-xs sm:text-sm font-medium hover:text-primary transition-colors">
-                  Pricing
-                </Link>
-                <Link href="/form" className="text-xs sm:text-sm font-medium hover:text-primary transition-colors hidden md:inline">
-                  Create Project
-                </Link>
-                <ThemeToggle />
-                <AuthNav />
-              </div>
-            </div>
-          </nav>
-          <main className="min-h-[calc(100vh-4rem)]">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
             {children}
           </main>
           <footer className="border-t bg-muted/50 mt-auto">
@@ -97,7 +71,7 @@ export default function RootLayout({
         </ThemeProvider>
         <Script id="register-sw" strategy="afterInteractive">
           {`
-            if ('serviceWorker' in navigator) {
+            if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
               window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
                   .then((registration) => {

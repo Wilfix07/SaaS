@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { CompleteFormData } from '@/lib/form-schema';
 

@@ -38,7 +38,8 @@ function FormPageContent() {
   const router = useRouter();
 
   const form = useForm<CompleteFormData>({
-    resolver: zodResolver(completeFormSchema) as any,
+    resolver: zodResolver(completeFormSchema),
+    mode: 'onChange',
     defaultValues: {
       brandIdentity: {
         projectName: '',
@@ -328,13 +329,8 @@ function FormPageContent() {
 
   if (generatedPrompt) {
     return (
-<<<<<<< HEAD
       <div className="container mx-auto py-6 sm:py-8 max-w-4xl px-4 sm:px-6 page-transition">
         <div className="space-y-4 sm:space-y-6 animate-fade-in">
-=======
-      <div className="container mx-auto py-4 sm:py-8 px-4 max-w-4xl">
-        <div className="space-y-4 sm:space-y-6">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold">Your AI Prompt is Ready!</h1>
             <p className="text-sm sm:text-base text-muted-foreground mt-2">
@@ -342,21 +338,12 @@ function FormPageContent() {
             </p>
           </div>
 
-<<<<<<< HEAD
           <div className="bg-muted p-4 sm:p-6 rounded-lg relative">
             <pre className="whitespace-pre-wrap text-xs sm:text-sm overflow-x-auto">{generatedPrompt}</pre>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Button onClick={handleCopyPrompt} className="flex-1 active:scale-95">
-=======
-          <div className="bg-muted p-4 sm:p-6 rounded-lg relative overflow-x-auto">
-            <pre className="whitespace-pre-wrap text-xs sm:text-sm">{generatedPrompt}</pre>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <Button onClick={handleCopyPrompt} className="flex-1">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
               {isCopied ? (
                 <>
                   <Check className="mr-2 h-4 w-4" />
@@ -381,13 +368,8 @@ function FormPageContent() {
 
           <div className="space-y-2">
             <p className="text-xs sm:text-sm text-muted-foreground">Open in your favorite IDE:</p>
-<<<<<<< HEAD
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Button variant="secondary" onClick={handleOpenInCursor} className="active:scale-95">
-=======
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              <Button variant="secondary" onClick={handleOpenInCursor}>
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
                 Cursor
               </Button>
               <Button variant="secondary" onClick={handleOpenInReplit} className="active:scale-95">
@@ -415,11 +397,7 @@ function FormPageContent() {
   }
 
   return (
-<<<<<<< HEAD
     <div className="container mx-auto py-4 sm:py-6 md:py-8 px-4 sm:px-6 page-transition">
-=======
-    <div className="container mx-auto py-4 sm:py-8 px-4">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
       <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">AI Prompt Generator</h1>
@@ -548,17 +526,10 @@ function FormPageContent() {
         </div>
       </div>
 
-<<<<<<< HEAD
       <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
-        <div className="space-y-4 sm:space-y-6 transition-all duration-300 w-full lg:flex-shrink-0" style={{ width: '100%', maxWidth: '100%' }}>
+        <div className="space-y-4 sm:space-y-6 transition-all duration-300 w-full lg:flex-shrink-0">
                             <Tabs value={currentStep.toString()} className="w-full">
                     <TabsList className="grid grid-cols-7 w-full overflow-x-auto">
-=======
-      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
-        <div className="space-y-4 sm:space-y-6 transition-all duration-300 w-full lg:w-auto" style={{ width: '100%', minWidth: 'auto', flexShrink: 0, maxWidth: '100%' }}>
-                            <Tabs value={currentStep.toString()} className="w-full">
-                    <TabsList className="grid grid-cols-7 w-full text-xs sm:text-sm overflow-x-auto">
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
               {steps.map((step, index) => (
                 <TabsTrigger
                   key={index}
@@ -588,11 +559,7 @@ function FormPageContent() {
           />
         </div>
 
-<<<<<<< HEAD
         <div className="transition-all duration-300 w-full lg:w-auto lg:flex-1">
-=======
-        <div className="transition-all duration-300 w-full lg:w-auto hidden lg:block" style={{ width: '100%', minWidth: 'auto', flexShrink: 0 }}>
->>>>>>> 0a840a2f8d0c5ebf230be2621532c7995a953914
           <FormPreview
             formData={formData}
             isVisible={isPreviewVisible}
